@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class BasicFileMetadataService {
+public class FileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
   private final FileMetadataMapper fileMetadataMapper;
