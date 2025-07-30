@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.department;
+package com.team1.hrbank.domain.department.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
 import jakarta.persistence.Column;

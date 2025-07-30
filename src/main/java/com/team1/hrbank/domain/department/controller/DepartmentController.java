@@ -1,5 +1,6 @@
-package com.team1.hrbank.domain.department;
+package com.team1.hrbank.domain.department.controller;
 
+import com.team1.hrbank.domain.department.service.JpaDepartmentService;
 import com.team1.hrbank.domain.department.dto.DepartmentDto;
 import com.team1.hrbank.domain.department.request.DepartmentCreateRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DepartmentController {
 
-  private final DepartmentService departmentService;
+  private final JpaDepartmentService jpaDepartmentService;
 
   @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<DepartmentDto> create(
       @RequestBody DepartmentCreateRequestDto departmentCreateRequestDto) {
-    DepartmentDto department = departmentService.create(departmentCreateRequestDto);
+    DepartmentDto department = jpaDepartmentService.create(departmentCreateRequestDto);
     return ResponseEntity.ok(department);
   }
 

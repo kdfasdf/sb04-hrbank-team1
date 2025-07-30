@@ -1,6 +1,9 @@
-package com.team1.hrbank.domain.department;
+package com.team1.hrbank.domain.department.service;
 
+import com.team1.hrbank.domain.department.Mapper.DepartmentMapper;
 import com.team1.hrbank.domain.department.dto.DepartmentDto;
+import com.team1.hrbank.domain.department.entity.Department;
+import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.department.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.request.DepartmentUpdateRequestDto;
 import java.util.List;
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DepartmentServiceImpl implements DepartmentService {
+public class DepartmentService implements JpaDepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final DepartmentMapper departmentMapper;
@@ -20,7 +23,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   public DepartmentDto create(DepartmentCreateRequestDto departmentCreateRequestDto) {
     Department departmentEntity = departmentMapper.toDepartment(departmentCreateRequestDto);
     if (departmentRepository.existsByName(departmentEntity.getName())) {
-      throw new IllegalArgumentException("중복된 이름이 존재 합니다.");
+      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
     }
 
     Department savedDepartment = departmentRepository.save(departmentEntity);
@@ -32,7 +35,25 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Override
   public DepartmentDto update(DepartmentUpdateRequestDto departmentUpdateRequestDto) {
-    return null;
+    Department departmentEntity = departmentMapper.toDepartment(departmentUpdateRequestDto);
+
+    Department department = departmentRepository.findById(departmentEntity.getId())
+        .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
+
+    if (departmentRepository.existsByName(departmentEntity.getName())) {
+      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
+    }
+
+    department.setName(departmentEntity.getName());
+    department.setDescription(departmentEntity.getDescription());
+    department.setEstablishedDate(departmentEntity.getEstablishedDate());
+
+    departmentRepository.save(department);
+
+    // 부서에 소속된 직원 수 조회가 완성 됐을 시 employeeRepository 참조하여 아래 메서드를 return 으로 변경 create 와 동일
+    // DepartmentDto departmentDto = this.toDepartmentDto(savedDepartment);
+
+    return departmentMapper.toDepartmentDto(department);
   }
 
   @Override
