@@ -28,4 +28,12 @@ public class DepartmentController {
     return ResponseEntity.ok(department);
   }
 
+  @PatchMapping(path = "{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<DepartmentDto> update(@PathVariable long id,
+      @RequestBody DepartmentUpdateRequestDto departmentUpdateRequestDto
+  ) {
+    DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);
+    return ResponseEntity.ok(department);
+  }
+
 }
