@@ -35,7 +35,6 @@ public class JpaEmployeeService implements EmployeeService {
     }
 
     String employeeNumber = createEmployeeNumber();
-
     Employee employee = EmployeeMapper.toEmployee(employeeCreateRequest, employeeNumber, deparment,
         fileMetaData);
 
