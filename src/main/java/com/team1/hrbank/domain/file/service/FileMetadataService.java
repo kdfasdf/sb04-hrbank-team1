@@ -29,32 +29,21 @@ public class FileMetadataService {
   @Transactional
   public FileMetadataDto uploadProfileImage(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
-    if (originalFilename == null || !originalFilename.contains(".")) {
-      throw new IllegalArgumentException("올바르지 않은 파일명");
-    }
+    validateOriginalFileName(originalFilename);
 
     String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
         .toLowerCase();
-    if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
-    }
+    validateAllowedProfileExtension(extension);
 
     String rootPath = System.getProperty("user.dir");
     File uploadDir = new File(rootPath, PROFILE_PATH);
-    if (!uploadDir.exists() && !uploadDir.mkdirs()) {
-      throw new RuntimeException("디렉토리 생성 실패");
-    }
+    ensureDirectoryExists(uploadDir);
 
     String savedName = UUID.randomUUID() + "." + extension;
-    File destFile = new File(uploadDir, savedName);
-    try {
-      file.transferTo(destFile); // 실제 파일 저장
-    } catch (IOException e) {
-      throw new RuntimeException("파일 저장 중 오류 발생", e);
-    }
+    File destFile = saveFileToDirectory(file, uploadDir, savedName);
 
     FileMetadata metadata = FileMetadata.builder()
-        .originalName(file.getOriginalFilename())
+        .originalName(originalFilename)
         .savedName(savedName)
         .fileType(FileType.valueOf(extension.toUpperCase()))
         .fileUsageType(FileUsageType.PROFILE)
@@ -65,5 +54,34 @@ public class FileMetadataService {
     FileMetadata savedProfileImage = fileMetadataRepository.save(metadata);
 
     return fileMetadataMapper.mapToDto(savedProfileImage);
+  }
+
+  // 공통 메서드
+  private void validateOriginalFileName(String fileName) {
+    if (fileName == null || !fileName.contains(".")) {
+      throw new IllegalArgumentException("올바르지 않은 파일명");
+    }
+  }
+
+  private void validateAllowedProfileExtension(String extension) {
+    if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
+      throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
+    }
+  }
+
+  private void ensureDirectoryExists(File dir) {
+    if (!dir.exists() && !dir.mkdirs()) {
+      throw new RuntimeException("디렉토리 생성 실패");
+    }
+  }
+
+  private File saveFileToDirectory(MultipartFile file, File dir, String savedName) {
+    File destFile = new File(dir, savedName);
+    try {
+      file.transferTo(destFile); // 실제 파일 저장
+      return destFile;
+    } catch (IOException e) {
+      throw new RuntimeException("파일 저장 중 오류 발생", e);
+    }
   }
 }
