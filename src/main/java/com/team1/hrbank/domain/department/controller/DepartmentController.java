@@ -29,7 +29,7 @@ public class DepartmentController {
   }
 
   @PatchMapping(path = "{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<DepartmentDto> update(@PathVariable long id,
+  public ResponseEntity<DepartmentDto> update(@PathVariable("id") long id,
       @RequestBody DepartmentUpdateRequestDto departmentUpdateRequestDto
   ) {
     DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);

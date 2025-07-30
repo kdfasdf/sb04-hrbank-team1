@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.department.Mapper;
+package com.team1.hrbank.domain.department.mapper;
 
 import com.team1.hrbank.domain.department.dto.DepartmentDto;
 import com.team1.hrbank.domain.department.entity.Department;

@@ -1,6 +1,6 @@
 package com.team1.hrbank.domain.department.service;
 
-import com.team1.hrbank.domain.department.Mapper.DepartmentMapper;
+import com.team1.hrbank.domain.department.mapper.DepartmentMapper;
 import com.team1.hrbank.domain.department.dto.DepartmentDto;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
