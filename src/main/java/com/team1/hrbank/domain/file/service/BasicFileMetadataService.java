@@ -9,6 +9,7 @@ import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +30,13 @@ public class BasicFileMetadataService implements FileMetadataService {
   public FileMetadataDto uploadProfile(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
     if (originalFilename == null || !originalFilename.contains(".")) {
-      throw new IllegalArgumentException("파일 이름이 올바르지 않습니다.");
+      throw new IllegalArgumentException("파일 이름이 올바르지 않음");
     }
 
     String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
         .toLowerCase();
     if (!ALLOWED_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("Only png, jpg, jpeg file is allowed");
+      throw new IllegalArgumentException("png, jpg, jpeg만 가능");
     }
 
     File uploadDir = new File(PROFILE_PATH);
@@ -43,7 +44,8 @@ public class BasicFileMetadataService implements FileMetadataService {
       throw new RuntimeException("디렉토리 생성 실패");
     }
 
-    File destFile = new File(uploadDir, originalFilename);
+    String uniqueFileName = UUID.randomUUID() + "." + extension;
+    File destFile = new File(uploadDir, uniqueFileName);
     try {
       file.transferTo(destFile); // 실제 파일 저장
     } catch (IOException e) {
