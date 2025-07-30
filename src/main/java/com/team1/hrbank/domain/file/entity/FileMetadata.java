@@ -22,20 +22,23 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FileMetadata extends BaseEntity {
 
-  @Column(name = "name", nullable = false, length = 255)
-  private String fileName;
+  @Column(name = "original_name", nullable = false, length = 255)
+  private String originalName;
+
+  @Column(name = "saved_name", nullable = false, length = 100)
+  private String savedName;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "type", nullable = false, length = 10)
+  @Column(name = "file_type", nullable = false, length = 10)
   private FileType fileType;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "usage_type", nullable = false, length = 10)
   private FileUsageType fileUsageType;
 
-  @Column(name = "size", nullable = false)
+  @Column(name = "file_size", nullable = false)
   private Long fileSize;
 
-  @Column(name = "path", nullable = false, length = 500)
+  @Column(name = "file_path", nullable = false, length = 500)
   private String filePath;
 }

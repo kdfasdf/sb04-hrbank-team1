@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
@@ -26,10 +27,10 @@ public class FileMetadataService {
   private static final String PROFILE_PATH = "uploads/profile";
 
   @Transactional
-  public FileMetadataDto uploadProfile(MultipartFile file) {
+  public FileMetadataDto uploadProfileImage(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
     if (originalFilename == null || !originalFilename.contains(".")) {
-      throw new IllegalArgumentException("파일 이름이 올바르지 않음");
+      throw new IllegalArgumentException("올바르지 않은 파일명");
     }
 
     String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
@@ -38,13 +39,14 @@ public class FileMetadataService {
       throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
     }
 
-    File uploadDir = new File(PROFILE_PATH);
+    String rootPath = System.getProperty("user.dir");
+    File uploadDir = new File(rootPath, PROFILE_PATH);
     if (!uploadDir.exists() && !uploadDir.mkdirs()) {
       throw new RuntimeException("디렉토리 생성 실패");
     }
 
-    String uniqueFileName = UUID.randomUUID() + "." + extension;
-    File destFile = new File(uploadDir, uniqueFileName);
+    String savedName = UUID.randomUUID() + "." + extension;
+    File destFile = new File(uploadDir, savedName);
     try {
       file.transferTo(destFile); // 실제 파일 저장
     } catch (IOException e) {
@@ -52,7 +54,8 @@ public class FileMetadataService {
     }
 
     FileMetadata metadata = FileMetadata.builder()
-        .fileName(file.getOriginalFilename())
+        .originalName(file.getOriginalFilename())
+        .savedName(savedName)
         .fileType(FileType.valueOf(extension.toUpperCase()))
         .fileUsageType(FileUsageType.PROFILE)
         .fileSize(file.getSize())
