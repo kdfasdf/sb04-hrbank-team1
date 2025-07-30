@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.department.request;
+package com.team1.hrbank.domain.department.dto.request;
 
 public record DepartmentSearchRequestDto(
 

@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.department.response;
+package com.team1.hrbank.domain.department.dto.response;
 
 import com.team1.hrbank.domain.department.dto.DepartmentDto;
 import java.util.List;
