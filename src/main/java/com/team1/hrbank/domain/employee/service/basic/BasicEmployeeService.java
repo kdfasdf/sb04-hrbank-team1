@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.employee.service.jpa;
+package com.team1.hrbank.domain.employee.service.basic;
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class JpaEmployeeService implements EmployeeService {
+public class BasicEmployeeService implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
   private final DepartMentRepository departMentRepository;
@@ -40,7 +40,7 @@ public class JpaEmployeeService implements EmployeeService {
 
     // TODO employeeCreateRequest.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
 
-    return EmployeeMapper.toEmployeeDto(employeeRepository.createEmployee(employee));
+    return EmployeeMapper.toEmployeeDto(employeeRepository.save(employee));
   }
 
   private String createEmployeeNumber() {
@@ -54,7 +54,7 @@ public class JpaEmployeeService implements EmployeeService {
     String employeeNumber = prefix + "-" + year + "-" + unique;
 
     // 중복 확인 후 재귀 호출
-    if (employeeRepository.findEmployeeByEmployeeNumber(employeeNumber).isPresent()) {
+    if (employeeRepository.findByEmployeeNumber(employeeNumber).isPresent()) {
       return createEmployeeNumber(); // 중복 시 다시 생성
     }
 
@@ -71,7 +71,7 @@ public class JpaEmployeeService implements EmployeeService {
   }
 
   private void validateEmail(String email) {
-    if (employeeRepository.findEmployeeByEmail(email).isPresent()) {
+    if (employeeRepository.findByEmail(email).isPresent()) {
       throw new IllegalArgumentException("Employee number already in use");
     }
   }
