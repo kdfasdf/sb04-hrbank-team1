@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class JpaEmployeeService implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
-  private final DepartmentService departmentService;
+  private final DepartMentRepository departMentRepository;
   private final FileMetaDataService fileMetaDataService;
 
   @Transactional
@@ -29,10 +29,8 @@ public class JpaEmployeeService implements EmployeeService {
     validateEmail(employeeCreateRequest.email());
     Deparment deparment = validateDepartment(employeeCreateRequest.departmentId());
 
-    FileMetaData fileMetaData;
-    if (profile.isEmpty()) {
-      fileMetaData = fileMetaDataService.findBasicProfile(); // 기본 이미지 설정
-    } else {
+    FileMetaData fileMetaData = null;
+    if (profile != null && !profile.isEmpty()) {
       fileMetaData = fileMetaDataService.createFileMetaData(profile);
     }
 
@@ -65,7 +63,8 @@ public class JpaEmployeeService implements EmployeeService {
   }
 
   private Department validateDepartment(Long departmentId) {
-    Optional<Department> department = departmentService.findDepartmentByDepartmentId();
+    Optional<Department> department = departMentRepository.findDepartmentByDepartmentId(
+        departmentId);
     if (department.isEmpty()) {
       throw new IllegalArgumentException("Department not found");
     }

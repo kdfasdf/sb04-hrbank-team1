@@ -34,14 +34,14 @@ public class JpaEmployeeRepository implements EmployeeRepository {
   }
 
   @Override
-  public Employee findEmployee(long id) {
-    return em.createQuery("SELECT e FROM Employee e "
-            + " JOIN FETCH e.department"
-            + " JOIN FETCH e.fileMetaData"
-            + " WHERE e.id=:id", Employee.class)
+  public Optional<Employee> findEmployeeByEmployeeId(long id) {
+    return em.createQuery("SELECT e FROM Employee e " +
+            "JOIN FETCH e.department " +
+            "JOIN FETCH e.fileMetaData " +
+            "WHERE e.id = :id", Employee.class)
         .setParameter("id", id)
-        .getResultStream().findFirst()
-        .orElse(null);
+        .getResultStream()
+        .findFirst();
   }
 
   @Override
@@ -60,5 +60,14 @@ public class JpaEmployeeRepository implements EmployeeRepository {
         .setParameter("email", email)
         .getResultStream()
         .findFirst(); // Optional<Employee> 반환
+  }
+
+  @Override
+  public long countByDepartmentId(Long departmentId) {
+    return em.createQuery(
+            "SELECT COUNT(e) FROM Employee e WHERE e.department.id = :departmentId",
+            Long.class)
+        .setParameter("departmentId", departmentId)
+        .getSingleResult();
   }
 }
