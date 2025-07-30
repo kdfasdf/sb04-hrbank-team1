@@ -14,6 +14,7 @@ import jakarta.persistence.CascadeType;
 
 import java.time.LocalDate;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "employees")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Employee extends BaseEntity {
@@ -51,17 +53,4 @@ public class Employee extends BaseEntity {
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "metadata_id")
   private FileMetadata fileMetaData;  // 프로필 이미지 ID
-
-  public Employee(String employeeNumber, String name, String email,
-      String position, LocalDate hireDate, EmployeeStatus status,
-      Department department, FileMetadata fileMetaData) {
-    this.employeeNumber = employeeNumber;
-    this.name = name;
-    this.email = email;
-    this.position = position;
-    this.hireDate = hireDate;
-    this.status = status;
-    this.department = department;
-    this.fileMetaData = fileMetaData;
-  }
 }
