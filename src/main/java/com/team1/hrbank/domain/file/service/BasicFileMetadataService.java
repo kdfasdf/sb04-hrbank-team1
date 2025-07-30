@@ -17,15 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class BasicFileMetadataService implements FileMetadataService {
+public class BasicFileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
   private final FileMetadataMapper fileMetadataMapper;
 
-  private static final List<String> ALLOWED_EXTENSIONS = List.of("png", "jpg", "jpeg");
+  private static final List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
   private static final String PROFILE_PATH = "uploads/profile";
 
-  @Override
   @Transactional
   public FileMetadataDto uploadProfile(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
@@ -35,8 +34,8 @@ public class BasicFileMetadataService implements FileMetadataService {
 
     String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
         .toLowerCase();
-    if (!ALLOWED_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("png, jpg, jpeg만 가능");
+    if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
+      throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
     }
 
     File uploadDir = new File(PROFILE_PATH);
