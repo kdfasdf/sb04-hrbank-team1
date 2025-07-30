@@ -1,7 +1,5 @@
 package com.team1.hrbank.domain.file.dto;
 
-import java.time.LocalDateTime;
-
 public record FileMetadataDto(
     String fileName,
     String fileType,
@@ -9,4 +7,5 @@ public record FileMetadataDto(
     Long fileSize,
     String filePath
 ) {
+
 }
