@@ -2,9 +2,11 @@ package com.team1.hrbank.domain.employee.service;
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
+import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.employee.request.EmployeeCreateRequest;
+import com.team1.hrbank.domain.employee.request.EmployeeUpdateRequest;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -19,6 +21,7 @@ public class EmployeeService {
   private final EmployeeRepository employeeRepository;
   private final DepartMentRepository departMentRepository;
   private final FileMetaDataService fileMetaDataService;
+  private final EmployeeMapper employeeMapper;
 
   @Transactional
   public EmployeeDto createEmployee(EmployeeCreateRequest employeeCreateRequest,
@@ -33,12 +36,13 @@ public class EmployeeService {
     }
 
     String employeeNumber = createEmployeeNumber();
-    Employee employee = EmployeeMapper.toEmployee(employeeCreateRequest, employeeNumber, deparment,
+    Employee employee = employeeMapper.toEmployee(employeeCreateRequest, employeeNumber,
+        EmployeeStatus.ACTIVE, deparment,
         fileMetaData);
 
     // TODO employeeCreateRequest.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
 
-    return EmployeeMapper.toEmployeeDto(employeeRepository.save(employee));
+    return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
   }
 
   private String createEmployeeNumber() {
