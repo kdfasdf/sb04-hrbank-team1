@@ -9,8 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("api/change-log")
 public class ChangeLogListController {
 
-    @PostMapping
-    public ResponseEntity<ChangeLog> addChangeLog(@RequestBody ChangeLog changeLog) {
-
-    }
 }
+
