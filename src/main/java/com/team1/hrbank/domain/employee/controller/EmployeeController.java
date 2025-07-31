@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +42,11 @@ public class EmployeeController {
 
     EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile);
     return ResponseEntity.ok(employeeDto);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    employeeService.deleteEmployee(id);
+    return ResponseEntity.noContent().build();
   }
 }
