@@ -7,6 +7,8 @@ import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ public class DepartmentService {
   public DepartmentDto create(DepartmentCreateRequestDto departmentCreateRequestDto) {
     Department departmentEntity = departmentMapper.toDepartment(departmentCreateRequestDto);
     if (departmentRepository.existsByName(departmentEntity.getName())) {
-      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
+      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.입력한 부서명 : " + departmentEntity.getName());
     }
 
     Department savedDepartment = departmentRepository.save(departmentEntity);
@@ -39,7 +41,7 @@ public class DepartmentService {
         .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
 
     if (departmentRepository.existsByName(departmentEntity.getName())) {
-      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
+      throw new IllegalArgumentException("중복된 부서명이 존재 합니다. 입력한 부서명 : " + departmentEntity.getName());
     }
 
     department.setName(departmentEntity.getName());
@@ -58,8 +60,9 @@ public class DepartmentService {
     return List.of();
   }
 
-  public DepartmentDto findById(long id) {
-    return null;
+  public DepartmentDto findById(Long id) {
+    return departmentRepository.findById(id).map(departmentRepository::toDto)
+        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 부서 ID 입니다. 입력한 아이디 : " + id));
   }
 
   public void delete(long id) {
