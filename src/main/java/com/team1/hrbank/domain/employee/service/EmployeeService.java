@@ -5,7 +5,7 @@ import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
-import com.team1.hrbank.domain.employee.request.EmployeeCreateRequest;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.request.EmployeeUpdateRequest;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -24,11 +24,11 @@ public class EmployeeService {
   private final EmployeeMapper employeeMapper;
 
   @Transactional
-  public EmployeeDto createEmployee(EmployeeCreateRequest employeeCreateRequest,
+  public EmployeeDto createEmployee(EmployeeCreateRequestDto employeeCreateRequestDto,
       MultipartFile profile) {
 
-    validateEmail(employeeCreateRequest.email());
-    Deparment deparment = validateDepartment(employeeCreateRequest.departmentId());
+    validateEmail(employeeCreateRequestDto.email());
+    Deparment deparment = validateDepartment(employeeCreateRequestDto.departmentId());
 
     FileMetaData fileMetaData = null;
     if (profile != null && !profile.isEmpty()) {
@@ -36,7 +36,7 @@ public class EmployeeService {
     }
 
     String employeeNumber = createEmployeeNumber();
-    Employee employee = employeeMapper.toEmployee(employeeCreateRequest, employeeNumber,
+    Employee employee = employeeMapper.toEmployee(employeeCreateRequestDto, employeeNumber,
         EmployeeStatus.ACTIVE, deparment,
         fileMetaData);
 

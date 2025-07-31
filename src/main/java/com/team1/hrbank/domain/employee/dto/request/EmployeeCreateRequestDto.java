@@ -1,8 +1,8 @@
-package com.team1.hrbank.domain.employee.request;
+package com.team1.hrbank.domain.employee.dto.request;
 
 import java.time.LocalDate;
 
-public record EmployeeCreateRequest(
+public record EmployeeCreateRequestDto(
     String name,
     String email,
     Long departmentId,

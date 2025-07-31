@@ -2,7 +2,7 @@ package com.team1.hrbank.domain.employee.controller;
 
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
-import com.team1.hrbank.domain.employee.request.EmployeeCreateRequest;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ public class EmployeeController {
 
   @PostMapping
   public ResponseEntity<EmployeeDto> createEmployee(
-      @RequestPart("employee") EmployeeCreateRequest employeeCreateRequest,
+      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequest, profile);
+    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
   }
 }

@@ -3,7 +3,7 @@ package com.team1.hrbank.domain.employee.mapper;
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
-import com.team1.hrbank.domain.employee.request.EmployeeCreateRequest;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import org.mapstruct.*;
@@ -25,7 +25,7 @@ public interface EmployeeMapper {
   @Mapping(target = "email", source = "employeeCreateRequest.email")
   @Mapping(target = "position", source = "employeeCreateRequest.position")
   @Mapping(target = "hireDate", source = "employeeCreateRequest.hireDate")
-  Employee toEmployee(EmployeeCreateRequest employeeCreateRequest,
+  Employee toEmployee(EmployeeCreateRequestDto employeeCreateRequestDto,
       String employeeNumber,
       EmployeeStatus employeeStatus,
       Department department,
