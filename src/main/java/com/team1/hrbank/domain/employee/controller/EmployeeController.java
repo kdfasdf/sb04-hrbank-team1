@@ -1,0 +1,33 @@
+package com.team1.hrbank.domain.employee.controller;
+
+
+import com.team1.hrbank.domain.employee.dto.EmployeeDto;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
+import com.team1.hrbank.domain.employee.service.EmployeeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequiredArgsConstructor
+@Tag(name = "Employee", description = "직원 관리 API")
+@RequestMapping("/api/employee")
+public class EmployeeController {
+
+  private final EmployeeService employeeService;
+
+  @PostMapping
+  public ResponseEntity<EmployeeDto> createEmployee(
+      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
+    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
+  }
+}
