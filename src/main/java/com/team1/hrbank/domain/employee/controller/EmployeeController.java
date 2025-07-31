@@ -62,4 +62,10 @@ public class EmployeeController {
         cursorPageRequestDto);
     return ResponseEntity.ok(cursorPageResponseEmployeeDto);
   }
+
+  @GetMapping("{id}")
+  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable Long id) {
+    EmployeeDto employeeDto = employeeService.findEmployee(id);
+    return ResponseEntity.ok(employeeDto);
+  }
 }

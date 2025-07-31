@@ -141,6 +141,10 @@ public class EmployeeService {
         hasNext);
   }
 
+  public EmployeeDto findEmployee(Long employeeId) {
+    return employeeMapper.toEmployeeDto(employeeRepository.findById(employeeId).get());
+  }
+
   private String createEmployeeNumber() {
     String prefix = "EMP"; // 직원
     String year = String.valueOf(LocalDate.now().getYear()); // 연도
