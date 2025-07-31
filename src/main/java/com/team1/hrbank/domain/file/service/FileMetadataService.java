@@ -34,7 +34,7 @@ public class FileMetadataService {
 
     FileMetadata savedProfileImage = fileMetadataRepository.save(metadata);
 
-    return fileMetadataMapper.mapToDto(savedProfileImage);
+    return fileMetadataMapper.toDto(savedProfileImage);
   }
 
   @Transactional
@@ -52,6 +52,6 @@ public class FileMetadataService {
 
     FileMetadata savedBackupFile = fileMetadataRepository.save(metadata);
 
-    return fileMetadataMapper.mapToDto(savedBackupFile);
+    return fileMetadataMapper.toDto(savedBackupFile);
   }
 }

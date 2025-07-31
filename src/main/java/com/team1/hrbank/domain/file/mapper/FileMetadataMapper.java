@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface FileMetadataMapper {
 
-  FileMetadataDto mapToDto(FileMetadata fileMetadata);
+  FileMetadataDto toDto(FileMetadata fileMetadata);
 }
