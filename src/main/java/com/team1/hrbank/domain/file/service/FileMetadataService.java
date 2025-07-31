@@ -67,12 +67,7 @@ public class FileMetadataService {
     File backupDir = new File(rootPath, BACKUP_PATH);
     ensureDirectoryExists(backupDir);
 
-    File destFile = new File(backupDir, savedName);
-    try(BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))){
-      writer.write(backupContent);
-    } catch (IOException e) {
-      throw new RuntimeException("CSV 파일 저장 실패", e);
-    }
+    File destFile = writeCsvFile(backupDir, savedName, backupContent);
 
     FileMetadata metadata = FileMetadata.builder()
         .originalName(savedName)
@@ -115,6 +110,16 @@ public class FileMetadataService {
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("파일 저장 중 오류 발생", e);
+    }
+  }
+
+  private File writeCsvFile(File dir, String savedName, String backupContent) {
+    File destFile = new File(dir, savedName);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))) {
+      writer.write(backupContent);
+      return destFile;
+    } catch (IOException e) {
+      throw new RuntimeException("CSV 파일 저장 실패", e);
     }
   }
 }
