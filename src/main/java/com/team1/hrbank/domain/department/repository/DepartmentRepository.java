@@ -7,17 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
-  Department save(Department department);
-
-  Optional<Department> findById(long id);
-
   List<Department> findByName(String name);
-
-  void deleteById(long id);
 
   boolean existsByName(String name);
 
-  String name(String name);
-
- // Optional<Department> findDepartmentByDepartmentId(long departmentId);
+  // 코드 병합시 직원에서 사용할 메서드
+  // Optional<Department> findDepartmentByDepartmentId(long departmentId);
 }

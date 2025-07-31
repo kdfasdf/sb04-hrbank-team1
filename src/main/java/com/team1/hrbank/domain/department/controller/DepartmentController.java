@@ -1,7 +1,7 @@
 package com.team1.hrbank.domain.department.controller;
 
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
-import com.team1.hrbank.domain.department.dto.DepartmentDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ public class DepartmentController {
     return ResponseEntity.ok(department);
   }
 
-  @PatchMapping(path = "{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<DepartmentDto> update(@PathVariable("id") long id,
+  @PatchMapping(path = "{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<DepartmentDto> update(@PathVariable("id") Long id,
       @RequestBody DepartmentUpdateRequestDto departmentUpdateRequestDto
   ) {
     DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);

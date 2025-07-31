@@ -1,19 +1,19 @@
 package com.team1.hrbank.domain.department.service;
 
 import com.team1.hrbank.domain.department.mapper.DepartmentMapper;
-import com.team1.hrbank.domain.department.dto.DepartmentDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DepartmentService {
 
   private final DepartmentRepository departmentRepository;
@@ -27,17 +27,15 @@ public class DepartmentService {
     }
 
     Department savedDepartment = departmentRepository.save(departmentEntity);
-    // 부서에 소속된 직원 수 조회가 완성 됐을 시 employeeRepository 참조하여 아래 메서드를 return 으로 변경
-    // DepartmentDto departmentDto = this.toDepartmentDto(savedDepartment);
 
     return departmentMapper.toDepartmentDto(savedDepartment);
   }
 
 
-  public DepartmentDto update(long id, DepartmentUpdateRequestDto departmentUpdateRequestDto) {
-    Department departmentEntity = departmentMapper.toDepartment(departmentUpdateRequestDto);
+  public DepartmentDto update(Long id, DepartmentUpdateRequestDto departmentUpdateRequestDto) {
+    Department departmentEntity = departmentMapper.toDepartment(id, departmentUpdateRequestDto);
 
-    Department department = departmentRepository.findById(departmentEntity.getId())
+    Department department = departmentRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
 
     if (departmentRepository.existsByName(departmentEntity.getName())) {
