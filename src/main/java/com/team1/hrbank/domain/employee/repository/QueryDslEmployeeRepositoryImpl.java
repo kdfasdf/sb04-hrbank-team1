@@ -74,6 +74,8 @@ public class QueryDslEmployeeRepositoryImpl implements QueryDslEmployeeRepositor
         .orderBy(order)
         .fetch();
 
+    // ./gradlew clean build 을 터미널에서 실행하고 빌드 실패가 안뜸, 지금 서로의 코드가 맞물려 작동하지 않기 때문에 빌드가 안되서 당장은 안됨
+
     return employees;
   }
 
