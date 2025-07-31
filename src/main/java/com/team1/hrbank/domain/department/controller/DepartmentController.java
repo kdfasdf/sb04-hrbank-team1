@@ -1,7 +1,7 @@
 package com.team1.hrbank.domain.department.controller;
 
 import com.team1.hrbank.domain.department.service.DepartmentService;
-import com.team1.hrbank.domain.department.dto.DepartmentDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

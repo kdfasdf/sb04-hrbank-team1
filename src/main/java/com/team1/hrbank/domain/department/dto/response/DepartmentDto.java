@@ -1,9 +1,9 @@
-package com.team1.hrbank.domain.department.dto;
+package com.team1.hrbank.domain.department.dto.response;
 
 import java.time.LocalDate;
 
 public record DepartmentDto(
-    long id,                      // 부서 ID
+    Long id,                      // 부서 ID
     String name,                  // 부서 이름
     String description,           // 부서 설명
     LocalDate establishedDate,    // 부서 설립일

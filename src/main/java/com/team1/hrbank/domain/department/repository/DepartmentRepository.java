@@ -7,15 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
-  Department save(Department department);
-
-  Optional<Department> findById(long id);
-
   List<Department> findByName(String name);
-
-  void deleteById(long id);
 
   boolean existsByName(String name);
 
-  String name(String name);
 }
