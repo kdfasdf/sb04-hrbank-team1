@@ -13,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class FileStorageManager {
 
-  List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
-  List<String> ALLOWED_BACKUP_EXTENSIONS = List.of("csv");
+  private static final List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
+  private static final List<String> ALLOWED_BACKUP_EXTENSIONS = List.of("csv");
   private static final String PROFILE_PATH = "uploads/profile";
   private static final String BACKUP_PATH = "uploads/backup";
 
