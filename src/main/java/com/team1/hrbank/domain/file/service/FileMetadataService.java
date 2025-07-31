@@ -42,7 +42,7 @@ public class FileMetadataService {
     File uploadDir = new File(rootPath, PROFILE_PATH);
     ensureDirectoryExists(uploadDir);
 
-    String savedName = UUID.randomUUID() + "." + extension;
+    String savedName = "profile_" + UUID.randomUUID() + "." + extension;
     File destFile = saveFileToDirectory(file, uploadDir, savedName);
 
     FileMetadata metadata = FileMetadata.builder()
@@ -59,9 +59,10 @@ public class FileMetadataService {
     return fileMetadataMapper.mapToDto(savedProfileImage);
   }
 
-  public FileMetadataDto generateBackupFile(String backupContent) {
+  @Transactional
+  public FileMetadataDto generateBackupFile(Long backupId, String backupContent) {
     String extension = "csv";
-    String savedName = UUID.randomUUID() + "." + extension;
+    String savedName = "backup_" + backupId + "." + extension;
 
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, BACKUP_PATH);
