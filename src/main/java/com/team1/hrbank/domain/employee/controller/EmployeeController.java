@@ -6,6 +6,7 @@ import com.team1.hrbank.domain.employee.request.EmployeeCreateRequest;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,6 @@ public class EmployeeController {
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequest, profile);
-    return ResponseEntity.ok(employeeDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
   }
 }
