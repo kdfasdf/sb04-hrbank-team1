@@ -1,6 +1,6 @@
 package com.team1.hrbank.domain.file.service;
 
-import com.team1.hrbank.domain.file.dto.FileMetadataDto;
+import com.team1.hrbank.domain.file.dto.response.FileMetadataDto;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
 import com.team1.hrbank.domain.file.entity.FileUsageType;
@@ -24,7 +24,9 @@ public class FileMetadataService {
   private final FileMetadataMapper fileMetadataMapper;
 
   private static final List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
+  private static final List<String> ALLOWED_BACKUP_EXTENSIONS = List.of("csv");
   private static final String PROFILE_PATH = "uploads/profile";
+  private static final String BACKUP_PATH = "uploads/backup";
 
   @Transactional
   public FileMetadataDto uploadProfileImage(MultipartFile file) {
@@ -56,6 +58,35 @@ public class FileMetadataService {
     return fileMetadataMapper.mapToDto(savedProfileImage);
   }
 
+  public FileMetadataDto uploadBackupFile(MultipartFile file) {
+    String originalFilename = file.getOriginalFilename();
+    validateOriginalFileName(originalFilename);
+
+    String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
+        .toLowerCase();
+    validateAllowedBackupExtension(extension);
+
+    String rootPath = System.getProperty("user.dir");
+    File uploadDir = new File(rootPath, BACKUP_PATH);
+    ensureDirectoryExists(uploadDir);
+
+    String savedName = UUID.randomUUID() + "." + extension;
+    File destFile = saveFileToDirectory(file, uploadDir, savedName);
+
+    FileMetadata metadata = FileMetadata.builder()
+        .originalName(originalFilename)
+        .savedName(savedName)
+        .fileType(FileType.valueOf(extension.toUpperCase()))
+        .fileUsageType(FileUsageType.BACKUP)
+        .fileSize(file.getSize())
+        .filePath(destFile.getAbsolutePath())
+        .build();
+
+    FileMetadata savedBackupFile = fileMetadataRepository.save(metadata);
+
+    return fileMetadataMapper.mapToDto(savedBackupFile);
+  }
+
   // 공통 메서드
   private void validateOriginalFileName(String fileName) {
     if (fileName == null || !fileName.contains(".")) {
@@ -66,6 +97,12 @@ public class FileMetadataService {
   private void validateAllowedProfileExtension(String extension) {
     if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
       throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
+    }
+  }
+
+  private void validateAllowedBackupExtension(String extension) {
+    if (!ALLOWED_BACKUP_EXTENSIONS.contains(extension)) {
+      throw new IllegalArgumentException("csv만 가능, 현재 확장자: " + extension);
     }
   }
 
