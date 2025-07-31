@@ -12,8 +12,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
   boolean existsByName(String name);
 
-  DepartmentDto toDto(Department department);
-
   // 코드 병합시 직원에서 사용할 메서드
   // Optional<Department> findDepartmentByDepartmentId(long departmentId);
 }

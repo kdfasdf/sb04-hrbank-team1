@@ -15,4 +15,6 @@ public interface DepartmentMapper {
 
   DepartmentDto toDepartmentDto(Department departmentEntity);
 
+  DepartmentDto toDto(Department department);
+
 }

@@ -60,8 +60,9 @@ public class DepartmentService {
     return List.of();
   }
 
+  @Transactional(readOnly = true)
   public DepartmentDto findById(Long id) {
-    return departmentRepository.findById(id).map(departmentRepository::toDto)
+    return departmentRepository.findById(id).map(departmentMapper::toDto)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 부서 ID 입니다. 입력한 아이디 : " + id));
   }
 
