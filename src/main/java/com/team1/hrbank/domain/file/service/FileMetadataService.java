@@ -29,16 +29,16 @@ public class FileMetadataService {
   private static final String BACKUP_PATH = "uploads/backup";
 
   @Transactional
-  public FileMetadataDto uploadProfileImage(MultipartFile file) {
+  public FileMetadataDto uploadFile(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
     validateOriginalFileName(originalFilename);
 
-    String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
-        .toLowerCase();
-    validateAllowedProfileExtension(extension);
+    String extension = extractExtension(originalFilename);
+    FileUsageType fileUsageType = determineFileUsageType(extension);
 
     String rootPath = System.getProperty("user.dir");
-    File uploadDir = new File(rootPath, PROFILE_PATH);
+    String uploadSubPath = fileUsageType == FileUsageType.PROFILE ? PROFILE_PATH : BACKUP_PATH;
+    File uploadDir = new File(rootPath, uploadSubPath);
     ensureDirectoryExists(uploadDir);
 
     String savedName = UUID.randomUUID() + "." + extension;
@@ -48,43 +48,14 @@ public class FileMetadataService {
         .originalName(originalFilename)
         .savedName(savedName)
         .fileType(FileType.valueOf(extension.toUpperCase()))
-        .fileUsageType(FileUsageType.PROFILE)
+        .fileUsageType(fileUsageType)
         .fileSize(file.getSize())
         .filePath(destFile.getAbsolutePath())
         .build();
 
-    FileMetadata savedProfileImage = fileMetadataRepository.save(metadata);
+    FileMetadata savedFile = fileMetadataRepository.save(metadata);
 
-    return fileMetadataMapper.mapToDto(savedProfileImage);
-  }
-
-  public FileMetadataDto uploadBackupFile(MultipartFile file) {
-    String originalFilename = file.getOriginalFilename();
-    validateOriginalFileName(originalFilename);
-
-    String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
-        .toLowerCase();
-    validateAllowedBackupExtension(extension);
-
-    String rootPath = System.getProperty("user.dir");
-    File uploadDir = new File(rootPath, BACKUP_PATH);
-    ensureDirectoryExists(uploadDir);
-
-    String savedName = UUID.randomUUID() + "." + extension;
-    File destFile = saveFileToDirectory(file, uploadDir, savedName);
-
-    FileMetadata metadata = FileMetadata.builder()
-        .originalName(originalFilename)
-        .savedName(savedName)
-        .fileType(FileType.valueOf(extension.toUpperCase()))
-        .fileUsageType(FileUsageType.BACKUP)
-        .fileSize(file.getSize())
-        .filePath(destFile.getAbsolutePath())
-        .build();
-
-    FileMetadata savedBackupFile = fileMetadataRepository.save(metadata);
-
-    return fileMetadataMapper.mapToDto(savedBackupFile);
+    return fileMetadataMapper.mapToDto(savedFile);
   }
 
   // 공통 메서드
@@ -94,15 +65,17 @@ public class FileMetadataService {
     }
   }
 
-  private void validateAllowedProfileExtension(String extension) {
-    if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
-    }
+  private String extractExtension(String fileName) {
+    return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
   }
 
-  private void validateAllowedBackupExtension(String extension) {
-    if (!ALLOWED_BACKUP_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("csv만 가능, 현재 확장자: " + extension);
+  private FileUsageType determineFileUsageType(String extension) {
+    if (ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
+      return FileUsageType.PROFILE;
+    } else if (ALLOWED_BACKUP_EXTENSIONS.contains(extension)) {
+      return FileUsageType.BACKUP;
+    } else {
+      throw new IllegalArgumentException("허용되지 않는 확장자: " + extension);
     }
   }
 
@@ -115,7 +88,7 @@ public class FileMetadataService {
   private File saveFileToDirectory(MultipartFile file, File dir, String savedName) {
     File destFile = new File(dir, savedName);
     try {
-      file.transferTo(destFile); // 실제 파일 저장
+      file.transferTo(destFile);
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("파일 저장 중 오류 발생", e);
