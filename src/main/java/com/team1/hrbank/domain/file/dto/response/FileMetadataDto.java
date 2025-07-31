@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.file.dto;
+package com.team1.hrbank.domain.file.dto.response;
 
 public record FileMetadataDto(
     String originalName,
