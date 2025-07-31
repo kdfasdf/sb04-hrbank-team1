@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "인증 API")
+@Tag(name = "Employee", description = "직원 관리 API")
 @RequestMapping("/api/employee")
 public class EmployeeController {
 
