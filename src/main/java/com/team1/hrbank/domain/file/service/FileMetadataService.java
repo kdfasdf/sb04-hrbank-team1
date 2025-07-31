@@ -6,7 +6,9 @@ import com.team1.hrbank.domain.file.entity.FileType;
 import com.team1.hrbank.domain.file.entity.FileUsageType;
 import com.team1.hrbank.domain.file.mapper.FileMetadataMapper;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -24,21 +26,20 @@ public class FileMetadataService {
   private final FileMetadataMapper fileMetadataMapper;
 
   private static final List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
-  private static final List<String> ALLOWED_BACKUP_EXTENSIONS = List.of("csv");
   private static final String PROFILE_PATH = "uploads/profile";
   private static final String BACKUP_PATH = "uploads/backup";
 
   @Transactional
-  public FileMetadataDto uploadFile(MultipartFile file) {
+  public FileMetadataDto uploadProfileImage(MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
     validateOriginalFileName(originalFilename);
 
-    String extension = extractExtension(originalFilename);
-    FileUsageType fileUsageType = determineFileUsageType(extension);
+    String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
+        .toLowerCase();
+    validateAllowedProfileExtension(extension);
 
     String rootPath = System.getProperty("user.dir");
-    String uploadSubPath = fileUsageType == FileUsageType.PROFILE ? PROFILE_PATH : BACKUP_PATH;
-    File uploadDir = new File(rootPath, uploadSubPath);
+    File uploadDir = new File(rootPath, PROFILE_PATH);
     ensureDirectoryExists(uploadDir);
 
     String savedName = UUID.randomUUID() + "." + extension;
@@ -48,15 +49,45 @@ public class FileMetadataService {
         .originalName(originalFilename)
         .savedName(savedName)
         .fileType(FileType.valueOf(extension.toUpperCase()))
-        .fileUsageType(fileUsageType)
+        .fileUsageType(FileUsageType.PROFILE)
         .fileSize(file.getSize())
         .filePath(destFile.getAbsolutePath())
         .build();
 
-    FileMetadata savedFile = fileMetadataRepository.save(metadata);
+    FileMetadata savedProfileImage = fileMetadataRepository.save(metadata);
 
-    return fileMetadataMapper.mapToDto(savedFile);
+    return fileMetadataMapper.mapToDto(savedProfileImage);
   }
+
+  public FileMetadataDto generateBackupFile(String backupContent) {
+    String extension = "csv";
+    String savedName = UUID.randomUUID() + "." + extension;
+
+    String rootPath = System.getProperty("user.dir");
+    File backupDir = new File(rootPath, BACKUP_PATH);
+    ensureDirectoryExists(backupDir);
+
+    File destFile = new File(backupDir, savedName);
+    try(BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))){
+      writer.write(backupContent);
+    } catch (IOException e) {
+      throw new RuntimeException("CSV 파일 저장 실패", e);
+    }
+
+    FileMetadata metadata = FileMetadata.builder()
+        .originalName(savedName)
+        .savedName(savedName)
+        .fileType(FileType.CSV)
+        .fileUsageType(FileUsageType.BACKUP)
+        .fileSize(destFile.length())
+        .filePath(destFile.getAbsolutePath())
+        .build();
+
+    FileMetadata savedBackupFile = fileMetadataRepository.save(metadata);
+
+    return fileMetadataMapper.mapToDto(savedBackupFile);
+  }
+
 
   // 공통 메서드
   private void validateOriginalFileName(String fileName) {
@@ -65,17 +96,9 @@ public class FileMetadataService {
     }
   }
 
-  private String extractExtension(String fileName) {
-    return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-  }
-
-  private FileUsageType determineFileUsageType(String extension) {
-    if (ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
-      return FileUsageType.PROFILE;
-    } else if (ALLOWED_BACKUP_EXTENSIONS.contains(extension)) {
-      return FileUsageType.BACKUP;
-    } else {
-      throw new IllegalArgumentException("허용되지 않는 확장자: " + extension);
+  private void validateAllowedProfileExtension(String extension) {
+    if (!ALLOWED_PROFILE_EXTENSIONS.contains(extension)) {
+      throw new IllegalArgumentException("png, jpg, jpeg만 가능, 현재 확장자: " + extension);
     }
   }
 
@@ -88,7 +111,7 @@ public class FileMetadataService {
   private File saveFileToDirectory(MultipartFile file, File dir, String savedName) {
     File destFile = new File(dir, savedName);
     try {
-      file.transferTo(destFile);
+      file.transferTo(destFile); // 실제 파일 저장
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("파일 저장 중 오류 발생", e);
