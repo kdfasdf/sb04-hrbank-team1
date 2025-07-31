@@ -9,7 +9,6 @@ import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.request.EmployeeUpdateRequest;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeService {
 
   private final EmployeeRepository employeeRepository;
-  private final DepartMentRepository departMentRepository;
+  private final DepartmentRepository departmentRepository;
   private final FileMetaDataService fileMetaDataService;
   private final EmployeeMapper employeeMapper;
 
@@ -27,8 +26,8 @@ public class EmployeeService {
   public EmployeeDto createEmployee(EmployeeCreateRequestDto employeeCreateRequestDto,
       MultipartFile profile) {
 
-    validateEmail(employeeCreateRequestDto.email());
-    Deparment deparment = validateDepartment(employeeCreateRequestDto.departmentId());
+    validateDuplicateEmail(employeeCreateRequestDto.email());
+    Deparment deparment = getValidateDepartment(employeeCreateRequestDto.departmentId());
 
     FileMetaData fileMetaData = null;
     if (profile != null && !profile.isEmpty()) {
@@ -63,18 +62,14 @@ public class EmployeeService {
     return employeeNumber;
   }
 
-  private Department validateDepartment(Long departmentId) {
-    Optional<Department> department = departMentRepository.findDepartmentByDepartmentId(
-        departmentId);
-    if (department.isEmpty()) {
-      throw new IllegalArgumentException("Department not found");
-    }
-    return department.get();
+  private Department getValidateDepartment(Long departmentId) {
+    return departmentRepository.findById(departmentId)
+        .orElseThrow(() -> new IllegalArgumentException("Department not found"));
   }
 
-  private void validateEmail(String email) {
+  private void validateDuplicateEmail(String email) {
     if (employeeRepository.findByEmail(email).isPresent()) {
-      throw new IllegalArgumentException("Employee number already in use");
+      throw new IllegalArgumentException("Email already in use");
     }
   }
 }
