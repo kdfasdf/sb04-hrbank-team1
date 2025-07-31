@@ -6,7 +6,6 @@ import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
-import com.team1.hrbank.domain.employee.request.EmployeeUpdateRequest;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
