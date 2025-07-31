@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class FileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
