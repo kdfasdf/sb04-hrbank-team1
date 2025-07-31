@@ -2,17 +2,19 @@ package com.team1.hrbank.domain.changelog.mapper;
 
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
+import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Component
-public class ChangeLogDiffMapper {
-    private static final String EMPTY = "-";
+@Mapper(componentModel = "spring")
+public interface ChangeLogDiffMapper {
 
-    public List<ChangeLogDiff> fromCreate(ChangeLog log, Employee after) {
+    String EMPTY = "-";
+
+    default List<ChangeLogDiff> fromCreate(ChangeLog log, Employee after) {
         return List.of(
                 new ChangeLogDiff(log, "입사일", EMPTY, after.getHireDate().toString()),
                 new ChangeLogDiff(log, "이름", EMPTY, after.getName()),
@@ -24,7 +26,7 @@ public class ChangeLogDiffMapper {
         );
     }
 
-    public List<ChangeLogDiff> fromDelete(ChangeLog log, Employee before) {
+    default List<ChangeLogDiff> fromDelete(ChangeLog log, Employee before) {
         return List.of(
                 new ChangeLogDiff(log, "입사일", before.getHireDate().toString(), EMPTY),
                 new ChangeLogDiff(log, "이름", before.getName(), EMPTY),
@@ -35,7 +37,7 @@ public class ChangeLogDiffMapper {
         );
     }
 
-    public List<ChangeLogDiff> fromUpdate(ChangeLog log, Employee before, Employee after) {
+    default List<ChangeLogDiff> fromUpdate(ChangeLog log, Employee before, Employee after) {
         List<ChangeLogDiff> diffs = new ArrayList<>();
 
         if (!Objects.equals(before.getName(), after.getName())) {
