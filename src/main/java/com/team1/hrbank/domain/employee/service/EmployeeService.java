@@ -48,7 +48,7 @@ public class EmployeeService {
   }
 
   @Transactional
-  public EmployeeDto updateEmployee(long employeeId,
+  public EmployeeDto updateEmployee(Long employeeId,
       EmployeeUpdateRequestDto employeeUpdateRequestDto,
       MultipartFile profile) {
     validateDuplicateEmail(employeeUpdateRequestDto.email());
@@ -75,6 +75,10 @@ public class EmployeeService {
     // TODO employeeUpdateRequestDto.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
   }
 
+  @Transactional
+  public void deleteEmployee(Long employeeId) {
+    employeeRepository.deleteById(employeeId);
+  }
 
   private String createEmployeeNumber() {
     String prefix = "EMP"; // 직원
