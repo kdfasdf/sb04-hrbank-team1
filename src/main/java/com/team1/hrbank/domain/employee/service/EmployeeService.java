@@ -1,6 +1,7 @@
 package com.team1.hrbank.domain.employee.service;
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
@@ -8,6 +9,7 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +45,36 @@ public class EmployeeService {
     return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
   }
 
+
+  @Transactional
+  public EmployeeDto updateEmployee(long employeeId,
+      EmployeeUpdateRequestDto employeeUpdateRequestDto,
+      MultipartFile profile) {
+    validateDuplicateEmail(employeeUpdateRequestDto.email());
+    Department department = getValidateDepartment(employeeUpdateRequestDto.departmentId());
+    Employee employee = getValdateEmployee(employeeId);
+
+    employee.setName(employeeUpdateRequestDto.name());
+    employee.setEmail(employeeUpdateRequestDto.email());
+    employee.setPosition(employeeUpdateRequestDto.position());
+    employee.setHireDate(employeeUpdateRequestDto.hireDate());
+
+    EmployeeStatus employeeStatus = EmployeeStatus.valueOf(employeeUpdateRequestDto.status());
+    employee.setStatus(employeeStatus);
+
+    employee.setDepartment(department);
+
+    FileMetaData fileMetaData = null;
+    if (profile != null && !profile.isEmpty()) {
+      fileMetaData = fileMetaDataService.createFileMetaData(profile);
+    }
+    employee.setFileMetaData(fileMetaData);
+
+    return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
+    // TODO employeeUpdateRequestDto.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
+  }
+
+
   private String createEmployeeNumber() {
     String prefix = "EMP"; // 직원
     String year = String.valueOf(LocalDate.now().getYear()); // 연도
@@ -70,5 +102,13 @@ public class EmployeeService {
     if (employeeRepository.findByEmail(email).isPresent()) {
       throw new IllegalArgumentException("Email already in use");
     }
+  }
+
+  private Employee getValdateEmployee(long employeeId) {
+    Optional<Employee> employee = employeeRepository.findById(employeeId);
+    if (employee.isEmpty()) {
+      throw new IllegalArgumentException("Employee not found");
+    }
+    return employee.get();
   }
 }
