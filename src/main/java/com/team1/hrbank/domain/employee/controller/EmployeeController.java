@@ -3,11 +3,14 @@ package com.team1.hrbank.domain.employee.controller;
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,5 +32,14 @@ public class EmployeeController {
 
     EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
+  }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
+      @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
+    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile);
+    return ResponseEntity.ok(employeeDto);
   }
 }
