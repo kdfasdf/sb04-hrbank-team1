@@ -25,7 +25,7 @@ public class DepartmentService {
 
 
   public DepartmentDto create(DepartmentCreateRequestDto departmentCreateRequestDto) {
-    Department departmentEntity = departmentMapper.toDepartment(departmentCreateRequestDto);
+    Department departmentEntity = departmentMapper.toEntity(departmentCreateRequestDto);
     if (departmentRepository.existsByName(departmentEntity.getName())) {
       throw new IllegalArgumentException("중복된 부서명이 존재 합니다.입력한 부서명 : " + departmentEntity.getName());
     }
@@ -37,7 +37,7 @@ public class DepartmentService {
 
 
   public DepartmentDto update(Long id, DepartmentUpdateRequestDto departmentUpdateRequestDto) {
-    Department departmentEntity = departmentMapper.toDepartment(id, departmentUpdateRequestDto);
+    Department departmentEntity = departmentMapper.toEntity(id, departmentUpdateRequestDto);
 
     Department department = departmentRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
