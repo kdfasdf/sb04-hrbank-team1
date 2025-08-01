@@ -18,7 +18,7 @@ public class FileStorageManager {
   private static final String PROFILE_PATH = "uploads/profile";
   private static final String BACKUP_PATH = "uploads/backup";
 
-  public StoredFileInfo uploadProfileImage(MultipartFile file) {
+  public StoredFileInfo uploadProfileImage(Long employeeId, MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
     validateOriginalFileName(originalFilename);
 
@@ -29,10 +29,25 @@ public class FileStorageManager {
     File uploadDir = new File(rootPath, PROFILE_PATH);
     ensureDirectoryExists(uploadDir);
 
-    String savedName = "profile_" + UUID.randomUUID() + "." + extension;
+    String savedName = "profile_" + employeeId + "_" + UUID.randomUUID() + "." + extension;
     File savedFile = saveFileToDirectory(file, uploadDir, savedName);
 
     return new StoredFileInfo(savedFile, extension);
+  }
+
+  public void deleteFile(String filePath) {
+    if (filePath == null || filePath.isBlank()) {
+      return;
+    }
+
+    File file = new File(filePath);
+
+    if (file.exists()) {
+      boolean deleted = file.delete();
+      if (!deleted) {
+        throw new RuntimeException("파일 삭제 실패: " + filePath);
+      }
+    }
   }
 
   public StoredFileInfo generateBackupFile(Long backupId, String backupContent) {
@@ -42,7 +57,7 @@ public class FileStorageManager {
     String extension = "csv";
     validateAllowedExtension(ALLOWED_BACKUP_EXTENSIONS, extension);
 
-    String savedName = "backup_" + backupId + "." + extension;
+    String savedName = "backup_" + backupId + "_" + UUID.randomUUID() + "." + extension;
 
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, BACKUP_PATH);
@@ -76,9 +91,9 @@ public class FileStorageManager {
   }
 
   private File saveFileToDirectory(MultipartFile file, File dir, String savedName) {
-    File destFile = new File(dir, savedName);
     try {
-      file.transferTo(destFile); // 실제 파일 저장
+      File destFile = new File(dir, savedName);
+      file.transferTo(destFile);
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("파일 저장 중 오류 발생", e);

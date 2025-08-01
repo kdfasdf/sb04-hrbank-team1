@@ -2,6 +2,7 @@ package com.team1.hrbank.domain.employee.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
 import com.team1.hrbank.domain.department.entity.Department;
+import com.team1.hrbank.domain.file.entity.FileMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
