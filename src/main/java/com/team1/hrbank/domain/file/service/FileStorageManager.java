@@ -35,6 +35,21 @@ public class FileStorageManager {
     return new StoredFileInfo(savedFile, extension);
   }
 
+  public void deleteFile(String filePath) {
+    if (filePath == null || filePath.isBlank()) {
+      return;
+    }
+
+    File file = new File(filePath);
+
+    if (file.exists()) {
+      boolean deleted = file.delete();
+      if (!deleted) {
+        throw new RuntimeException("파일 삭제 실패: " + filePath);
+      }
+    }
+  }
+
   public StoredFileInfo generateBackupFile(Long backupId, String backupContent) {
     if (backupContent == null || backupContent.trim().isEmpty()) {
       backupContent = "ID,직원번호,이름,이메일,부서,직급,입사일,상태";
