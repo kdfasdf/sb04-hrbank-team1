@@ -14,13 +14,14 @@ public interface EmployeeMapper {
 
   @Mapping(source = "department.id", target = "departmentId")
   @Mapping(source = "department.name", target = "departmentName")
-  @Mapping(source = "fileMetaData.id", target = "profileImageId")
+  @Mapping(source = "fileMetadata.id", target = "profileImageId")
   EmployeeDto toEmployeeDto(Employee employee);
 
   // EmployeeCreateRequest는 커스텀 매핑이 필요해서 @Mapping 사용
   @Mapping(target = "employeeNumber", source = "employeeNumber")
   @Mapping(target = "status", source = "employeeStatus")
   @Mapping(target = "department", source = "department")
+  @Mapping(target = "fileMetadata", ignore = true)
   @Mapping(target = "name", source = "employeeCreateRequestDto.name")
   @Mapping(target = "email", source = "employeeCreateRequestDto.email")
   @Mapping(target = "position", source = "employeeCreateRequestDto.position")
