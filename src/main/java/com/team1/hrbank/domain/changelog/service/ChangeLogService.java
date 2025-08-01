@@ -1,7 +1,7 @@
 package com.team1.hrbank.domain.changelog.service;
 
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
-import com.team1.hrbank.domain.changelog.dto.response.ChangeLogPageResponse;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
@@ -28,7 +28,7 @@ public class ChangeLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
 
-    public ChangeLogPageResponse findAll(ChangeLogSearchRequest request) {
+    public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
         int limit = DEFAULT_PAGE_SIZE + 1;
         List<ChangeLog> changeLogs = changeLogRepository.findAllByCondition(
                 request.employeeNumber(),
@@ -49,7 +49,7 @@ public class ChangeLogService {
             changeLogs = changeLogs.subList(0, DEFAULT_PAGE_SIZE);
         }
 
-        return new ChangeLogPageResponse(
+        return new ChangeLogSearchResponse(
                 changeLogs.stream().map(changeLogMapper::toDto).toList(),
                 hasNext,
                 nextCursor
