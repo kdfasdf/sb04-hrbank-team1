@@ -6,7 +6,10 @@ import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
+import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +21,13 @@ public class DepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final DepartmentMapper departmentMapper;
+  private final EmployeeRepository employeeRepository;
 
 
   public DepartmentDto create(DepartmentCreateRequestDto departmentCreateRequestDto) {
-    Department departmentEntity = departmentMapper.toDepartment(departmentCreateRequestDto);
+    Department departmentEntity = departmentMapper.toEntity(departmentCreateRequestDto);
     if (departmentRepository.existsByName(departmentEntity.getName())) {
-      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
+      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.입력한 부서명 : " + departmentEntity.getName());
     }
 
     Department savedDepartment = departmentRepository.save(departmentEntity);
@@ -33,13 +37,15 @@ public class DepartmentService {
 
 
   public DepartmentDto update(Long id, DepartmentUpdateRequestDto departmentUpdateRequestDto) {
-    Department departmentEntity = departmentMapper.toDepartment(id, departmentUpdateRequestDto);
+    Department departmentEntity = departmentMapper.toEntity(id, departmentUpdateRequestDto);
 
     Department department = departmentRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("부서를 찾을 수 없습니다."));
 
-    if (departmentRepository.existsByName(departmentEntity.getName())) {
-      throw new IllegalArgumentException("중복된 부서명이 존재 합니다.");
+    if (!department.getName().equals(departmentEntity.getName())
+        && departmentRepository.existsByName(departmentEntity.getName())) {
+      throw new IllegalArgumentException(
+          "중복된 부서명이 존재 합니다. 입력한 부서명 : " + departmentEntity.getName());
     }
 
     department.setName(departmentEntity.getName());
@@ -48,18 +54,17 @@ public class DepartmentService {
 
     Department updatedDepartment = departmentRepository.save(department);
 
-    // 부서에 소속된 직원 수 조회가 완성 됐을 시 employeeRepository 참조하여 아래 메서드를 return 으로 변경 create 와 동일
-    // DepartmentDto departmentDto = this.toDepartmentDto(savedDepartment);
-
-    return departmentMapper.toDepartmentDto(updatedDepartment);
+    return toDepartmentDto(updatedDepartment);
   }
 
   public List<DepartmentDto> findAll() {
     return List.of();
   }
 
-  public DepartmentDto findById(long id) {
-    return null;
+  @Transactional(readOnly = true)
+  public DepartmentDto findById(Long id) {
+    return departmentRepository.findById(id).map(this::toDepartmentDto)
+        .orElseThrow(() -> new NoSuchElementException("부서를 찾을 수 없습니다. ID : " + id));
   }
 
   public void delete(long id) {
@@ -67,7 +72,7 @@ public class DepartmentService {
   }
 
   // 부서별 직원 수 조회용 변환 메서드 분리
-   /* private DepartmentDto toDepartmentDto(Department department) {
+  private DepartmentDto toDepartmentDto(Department department) {
     int employeeCount = (int) employeeRepository.countByDepartmentId(department.getId());
     return new DepartmentDto(
         department.getId(),
@@ -76,5 +81,5 @@ public class DepartmentService {
         department.getEstablishedDate(),
         employeeCount
     );
-  } */
+  }
 }
