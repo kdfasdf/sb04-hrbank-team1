@@ -59,9 +59,25 @@ public class DepartmentService {
     return toDepartmentDto(updatedDepartment);
   }
 
-  public DepartmentPageResponseDto findAll(DepartmentSearchRequestDto  departmentSearchRequestDto) {
+  public DepartmentPageResponseDto getDepartments(
+      DepartmentSearchRequestDto departmentSearchRequestDto) {
+    List<DepartmentDto> content = departmentRepository.searchDepartments(
+        departmentSearchRequestDto);
 
-    return List.of();
+    Long nextIdAfter = content.isEmpty() ? null : content.get(content.size() - 1).id();
+    boolean hasNextPage = content.size() == (departmentSearchRequestDto.size() != null ? departmentSearchRequestDto.size() : 10);
+
+    long totalElements = departmentRepository.countDepartments((departmentSearchRequestDto.nameOrDescription()));
+
+    String nextCursor = nextIdAfter == null ? nextIdAfter.toString() : null;
+    return new DepartmentPageResponseDto(
+        content,
+        nextCursor,
+        nextIdAfter,
+        departmentSearchRequestDto.size() != null ? departmentSearchRequestDto.size() : 10,
+        totalElements,
+        hasNextPage
+    );
   }
 
   @Transactional(readOnly = true)

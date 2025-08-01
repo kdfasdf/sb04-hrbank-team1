@@ -1,5 +1,6 @@
 package com.team1.hrbank.domain.backup.scheduler;
 
+import com.team1.hrbank.domain.backup.service.BackupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

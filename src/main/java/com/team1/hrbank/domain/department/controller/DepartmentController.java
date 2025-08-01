@@ -1,8 +1,10 @@
 package com.team1.hrbank.domain.department.controller;
 
+import com.team1.hrbank.domain.department.dto.request.DepartmentSearchRequestDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.service.DepartmentService;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,6 +46,24 @@ public class DepartmentController {
   public ResponseEntity<DepartmentDto> findOne(@PathVariable("id") Long id) {
     DepartmentDto findOne = departmentService.findById(id);
     return ResponseEntity.ok(findOne);
+  }
+
+  @GetMapping
+  public ResponseEntity<DepartmentPageResponseDto> findDepartments(
+      @RequestParam(required = false) String nameOrDescription,
+      @RequestParam(required = false) Long idAfter,
+      @RequestParam(required = false) String cursor,
+      @RequestParam(required = false, defaultValue = "10") Integer size,
+      @RequestParam(required = false, defaultValue = "establishedDate") String sortField,
+      @RequestParam(required = false, defaultValue = "asc") String sortDirection
+  ) {
+
+    DepartmentSearchRequestDto requestDto = new DepartmentSearchRequestDto(nameOrDescription,
+        idAfter, cursor, size, sortField, sortDirection);
+
+    DepartmentPageResponseDto responseDto = departmentService.getDepartments(requestDto);
+
+    return ResponseEntity.ok(responseDto);
   }
 
 }

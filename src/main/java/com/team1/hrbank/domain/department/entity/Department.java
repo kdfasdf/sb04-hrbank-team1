@@ -1,11 +1,15 @@
 package com.team1.hrbank.domain.department.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
+import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,6 +26,19 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SqlResultSetMapping(
+    name = "DepartmentDtoMapping",
+    classes = @ConstructorResult(
+        targetClass = DepartmentDto.class,
+        columns = {
+            @ColumnResult(name = "id", type = Long.class),
+            @ColumnResult(name = "name", type = String.class),
+            @ColumnResult(name = "description", type = String.class),
+            @ColumnResult(name = "established_date", type = LocalDate.class),
+            @ColumnResult(name = "employee_count", type = Integer.class)
+        }
+    )
+)
 public class Department extends BaseEntity {
 
   @Column(name = "name", nullable = false, length = 50)
