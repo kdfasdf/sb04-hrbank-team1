@@ -15,7 +15,6 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
   private EntityManager em;
 
   public List<DepartmentDto> searchDepartments(DepartmentSearchRequestDto request) {
-
     String sortField = switch (request.sortField()) {
       case "name" -> "name";
       case "establishedDate" -> "established_date";
@@ -30,25 +29,21 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
                 (SELECT COUNT(*) FROM employee e WHERE e.department_id = d.id) AS employee_count
             FROM departments d
             WHERE
-                (? IS NULL OR LOWER(d.name) LIKE '%' || LOWER(?) || '%' OR LOWER(d.description) LIKE '%' || LOWER(?) || '%')
-                AND (? IS NULL OR d.id > ?)
+                (:keyword IS NULL OR d.name ILIKE CONCAT('%', :keyword, '%') OR d.description ILIKE CONCAT('%', :keyword, '%'))
+                AND (:idAfter IS NULL OR d.id > :idAfter)
             ORDER BY %s %s
-            LIMIT ?
+            LIMIT :limit
         """;
 
     String finalQuery = String.format(baseQuery, sortField, sortDirection);
 
     Query query = em.createNativeQuery(finalQuery, "DepartmentDtoMapping");
-    query.setParameter(1, request.nameOrDescription());
-    query.setParameter(2, request.nameOrDescription());
-    query.setParameter(3, request.nameOrDescription());
-    query.setParameter(4, request.idAfter());
-    query.setParameter(5, request.idAfter());
-    query.setParameter(6, request.size() != null ? request.size() : 10);
+    query.setParameter("keyword", request.nameOrDescription());
+    query.setParameter("idAfter", request.idAfter());
+    query.setParameter("limit", request.size() != null ? request.size() : 10);
 
     @SuppressWarnings("unchecked")
     List<DepartmentDto> result = query.getResultList();
-
     return result;
   }
 
@@ -56,13 +51,11 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
     String countQuery = """
             SELECT COUNT(*)
             FROM departments d
-            WHERE (? IS NULL OR LOWER(d.name) LIKE '%' || LOWER(?) || '%' OR LOWER(d.description) LIKE '%' || LOWER(?) || '%')
+            WHERE (:keyword IS NULL OR d.name ILIKE CONCAT('%', :keyword, '%') OR d.description ILIKE CONCAT('%', :keyword, '%'))
         """;
 
     Query query = em.createNativeQuery(countQuery);
-    query.setParameter(1, keyword);
-    query.setParameter(2, keyword);
-    query.setParameter(3, keyword);
+    query.setParameter("keyword", keyword);
 
     return ((Number) query.getSingleResult()).longValue();
   }
