@@ -4,7 +4,7 @@ import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import java.util.List;
 
-public interface QueryDslEmployeeRepository {
+public interface EmployeeRepositoryCustom {
 
-  List<Employee> findAllEmployeesByRequest(CursorPageRequestDto requestDto);
+  List<Employee> findAllEmployeesByRequestNative(CursorPageRequestDto dto);
 }
