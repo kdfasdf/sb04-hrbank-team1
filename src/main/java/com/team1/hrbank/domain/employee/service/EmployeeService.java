@@ -140,6 +140,10 @@ public class EmployeeService {
     return new CursorPageResponseEmployeeDto(content, nextCursor, nextIdAfter, size, totalElements,
         hasNext);
   }
+  /*
+  public EmployeeDto findEmployee(Long employeeId) {
+    return employeeMapper.toEmployeeDto(employeeRepository.findById(employeeId).get());
+  }*/
 
   private String createEmployeeNumber() {
     String prefix = "EMP"; // 직원
