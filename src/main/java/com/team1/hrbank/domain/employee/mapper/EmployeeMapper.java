@@ -21,10 +21,10 @@ public interface EmployeeMapper {
   @Mapping(target = "employeeNumber", source = "employeeNumber")
   @Mapping(target = "status", source = "employeeStatus")
   @Mapping(target = "department", source = "department")
-  @Mapping(target = "name", source = "employeeCreateRequest.name")
-  @Mapping(target = "email", source = "employeeCreateRequest.email")
-  @Mapping(target = "position", source = "employeeCreateRequest.position")
-  @Mapping(target = "hireDate", source = "employeeCreateRequest.hireDate")
+  @Mapping(target = "name", source = "employeeCreateRequestDto.name")
+  @Mapping(target = "email", source = "employeeCreateRequestDto.email")
+  @Mapping(target = "position", source = "employeeCreateRequestDto.position")
+  @Mapping(target = "hireDate", source = "employeeCreateRequestDto.hireDate")
   Employee toEmployee(EmployeeCreateRequestDto employeeCreateRequestDto,
       String employeeNumber,
       EmployeeStatus employeeStatus,
