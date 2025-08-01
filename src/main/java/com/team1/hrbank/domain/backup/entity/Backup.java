@@ -1,7 +1,7 @@
 package com.team1.hrbank.domain.backup.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
-import com.team1.hrbank.domain.filemetadata.entity.FileMetadata;
+import com.team1.hrbank.domain.file.entity.FileMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +12,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +22,8 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "backups")
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Backup extends BaseEntity {
 

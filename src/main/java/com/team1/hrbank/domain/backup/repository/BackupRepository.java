@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface BackupRepository extends JpaRepository<Backup, Long> {
 
   @Query("SELECT b FROM Backup b order by b.endedAt desc")
-  Optional<Backup> findRecentBackup();
+  Optional<Backup> findFirstByEndedAtDesc();
 }

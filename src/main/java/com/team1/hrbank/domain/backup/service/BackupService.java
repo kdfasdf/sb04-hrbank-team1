@@ -1,11 +1,16 @@
 package com.team1.hrbank.domain.backup.service;
 
+import com.team1.hrbank.domain.backup.dto.response.BackupDto;
 import com.team1.hrbank.domain.backup.entity.Backup;
 import com.team1.hrbank.domain.backup.entity.BackupStatus;
+import com.team1.hrbank.domain.backup.mapper.BackupMapper;
 import com.team1.hrbank.domain.backup.repository.BackupRepository;
-import com.team1.hrbank.domain.backup.service.BackupService.FileService;
+import com.team1.hrbank.domain.changelog.entity.ChangeLog;
+import com.team1.hrbank.domain.changelog.repository.ChangeLogRepository;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
+import com.team1.hrbank.domain.file.entity.FileMetadata;
+import com.team1.hrbank.domain.file.service.FileMetadataService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,64 +20,66 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BackupService {
 
   private final BackupRepository backupRepository;
   private final ChangeLogRepository changeLogRepository;
   private final EmployeeRepository employeeRepository;
 
-  private final FileService fileMetaDataService;
+  private final FileMetadataService fileMetaDataService;
+
+  private final BackupMapper backMapper;
 
   public BackupDto createBackup(String workerIp) {
     if (shouldSkipBackup()) {
       return skipBackup(workerIp);
     }
 
-    Backup backup = new Backup(workerIp, BackupStatus.IN_PROGRESS, LocalDateTime.now(), null);
+    Backup backup = Backup.builder()
+        .worker(workerIp)
+        .status(BackupStatus.IN_PROGRESS)
+        .build();
+
     backupRepository.save(backup);
 
     try {
       List<Employee> employees = employeeRepository.findAll();
       String employeeCsvFormat = makeEmployeeCsvFile(employees);
 
-      FileMetaData fileMetaData =fileMetaDataService.createBackupFile(backup.getId(), employeeCsvFormat);
-      backup.setMetadata(fileMetaData);
+      FileMetadata fileMetaData =fileMetaDataService.generateBackupFile(backup.getId(), employeeCsvFormat);
+      return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
-      backup.setStatus(BackupStatus.COMPLETED);
-      backup.setEndedAt(LocalDateTime.now());
-      backupRepository.save(backup);
-      return new BackupDto(backup.getId(), workerIp, backup.getCreatedAt(), backup.getEndedAt(), BackupStatus.COMPLETED, fileMetaData.getId());
     } catch (Exception e) {
-      backup.setStatus(BackupStatus.FAIL);
-      backup.setEndedAt(LocalDateTime.now());
-      backupRepository.save(backup);
-      FileMetaData fileMetadata = fileMetaDataService.createErrorLogFile(backup.getId(), e.getMessage());
-      return new BackupDto(backup.getId(), workerIp, backup.getCreatedAt(), backup.getEndedAt(), BackupStatus.FAIL, fileMetaData.getId();
+      //Todo 백업중이던 파일 삭제 fileMetaDataService.cancelGenerateBackFile(backup.getId());
+      FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(), e.getMessage());
+      //Todo 커스텀 예외 처리 후 GlobalExceptionHandler에서 에러 응답으로 반환
     }
 
-    return new BackupDto(0L, workerIp, null, null, BackupStatus.SKIPPED, null);
+    backup.setEndedAt(LocalDateTime.now());
+    return backMapper.toDto(backup);
   }
 
   private boolean shouldSkipBackup() {
-    Optional<ChangeLog> recentChangeLog = changeLogRepository.findRecentChangeLog();
+    Optional<ChangeLog> recentChangeLog = changeLogRepository.findFirstByUpdatedAtDesc();
     if(recentChangeLog.isEmpty()) {  //수정 내역 없으면 스킵
       return true;
     }
     LocalDateTime recentChangeLogTime = recentChangeLog.get().getUpdatedAt();
 
-    Optional<Backup> recentBackup = backupRepository.findRecentBackup();
+    Optional<Backup> recentBackup = backupRepository.findFirstByEndedAtDesc();
     if(recentBackup.isEmpty()) { // 첫 백업 수행해야함
       return false;
     }
     LocalDateTime recentBackupTime = recentBackup.get().getEndedAt();
 
-    return recentChangeLogTime.isAfter(recentBackupTime);
+    return recentChangeLogTime.isBefore(recentBackupTime);
   }
 
   private BackupDto skipBackup(String workerIp) {
     Backup backup = new Backup(workerIp, BackupStatus.SKIPPED, LocalDateTime.now(), null);
     backupRepository.save(backup);
-    return new BackupDto(backup.getId(), workerIp, backup.getCreatedAt(), backup.getEndedAt(), BackupStatus.SKIPPED, null);
+    return backMapper.toDto(backup);
   }
 
 
@@ -93,5 +100,14 @@ public class BackupService {
         )).collect(Collectors.joining("\n"));
 
     return header + "\n" +  body;
+  }
+
+  private BackupDto saveBackup(Backup backup, FileMetadata fileMetadata, String workerIp, BackupStatus status) {
+    backup.setMetadata(fileMetadata);
+    backup.setStatus(status);
+    backup.setEndedAt(LocalDateTime.now());
+    backup.setWorker(workerIp);
+    backupRepository.save(backup);
+    return backMapper.toDto(backup);
   }
 }

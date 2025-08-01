@@ -2,12 +2,11 @@ package com.team1.hrbank.domain.changelog.mapper;
 
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
-import org.mapstruct.Mapper;
-import org.springframework.stereotype.Component;
-
+import com.team1.hrbank.domain.employee.entity.Employee;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ChangeLogDiffMapper {
