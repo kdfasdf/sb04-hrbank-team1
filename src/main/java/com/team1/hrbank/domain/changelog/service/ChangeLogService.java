@@ -33,18 +33,26 @@ public class ChangeLogService {
     private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
 
     public List<ChangeLogDto> findAll(ChangeLogSearchRequest request) {
-        Specification<ChangeLog> spec = ChangeLogSpecification.changeLogSpecification(request); //필터링 기준 생성
-        Sort sort = switch (request.sortKey()){
+        Specification<ChangeLog> spec = ChangeLogSpecification.changeLogSpecification(request);//필터링 기준 생성
+
+        Sort sort = switch (request.sortKey()) {
             case CREATED_AT_ASC -> Sort.by(Sort.Direction.ASC, "createdAt");
             case CREATED_AT_DESC -> Sort.by(Sort.Direction.DESC, "createdAt");
             case IP_ADDRESS_ASC -> Sort.by(Sort.Direction.ASC, "ipAddress");
             case IP_ADDRESS_DESC -> Sort.by(Sort.Direction.DESC, "ipAddress");
-            default -> Sort.by(Sort.Direction.ASC, "id");
         };
 
-        if(request.lastId() != null){
+        Sort.Direction sortDirection = switch (request.sortKey()) {
+            case CREATED_AT_ASC, IP_ADDRESS_ASC -> Sort.Direction.ASC;
+            case CREATED_AT_DESC, IP_ADDRESS_DESC -> Sort.Direction.DESC;
+        };
+
+        if (request.lastId() != null) {
             spec = spec.and((root, query, cb) ->
-                    cb.lessThan(root.get("id"), request.lastId())); // 페이징
+                    sortDirection == Sort.Direction.ASC
+                            ? cb.greaterThan(root.get("id"), request.lastId())
+                            : cb.lessThan(root.get("id"), request.lastId())
+            );
         }
 
         PageRequest pageable = PageRequest.of(0, DEFAULT_PAGE_SIZE, sort);
