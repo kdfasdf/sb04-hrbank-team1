@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DepartmentCustomRepositoryImpl {
+public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepository {
 
   @PersistenceContext
   private EntityManager em;

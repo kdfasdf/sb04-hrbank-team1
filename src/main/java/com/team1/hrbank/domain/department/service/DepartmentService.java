@@ -59,6 +59,7 @@ public class DepartmentService {
     return toDepartmentDto(updatedDepartment);
   }
 
+  @Transactional(readOnly = true)
   public DepartmentPageResponseDto getDepartments(
       DepartmentSearchRequestDto departmentSearchRequestDto) {
     List<DepartmentDto> content = departmentRepository.searchDepartments(
@@ -69,7 +70,7 @@ public class DepartmentService {
 
     long totalElements = departmentRepository.countDepartments((departmentSearchRequestDto.nameOrDescription()));
 
-    String nextCursor = nextIdAfter == null ? nextIdAfter.toString() : null;
+    String nextCursor = nextIdAfter != null ? nextIdAfter.toString() : null;
     return new DepartmentPageResponseDto(
         content,
         nextCursor,
