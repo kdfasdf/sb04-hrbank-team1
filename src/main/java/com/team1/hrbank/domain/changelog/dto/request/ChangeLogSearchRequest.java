@@ -12,8 +12,7 @@ public record ChangeLogSearchRequest(
         LocalDateTime to,
         ChangeLogType type,
         SortKey sortKey,
-        Long lastId, //무한 스크롤 구현용
-        Integer size
+        Long lastId //무한 스크롤 구현용
 ) {
     public enum SortKey {
         IP_ADDRESS,

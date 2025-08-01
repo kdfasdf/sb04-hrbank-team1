@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.changelog.repository;
+package com.team1.hrbank.domain.changelog.repository.helper;
 
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
@@ -35,22 +35,22 @@ public class ChangeLogSpecification {
     }
 
     private static Specification<ChangeLog> employeeNumberEq(String employeeNumber) {
-        return ((root, query, criteriaBuilder) ->
-                employeeNumber == null ? null : criteriaBuilder.equal(root.get("employeeNumber"), employeeNumber));
+        return ((root, query, cb) ->
+                employeeNumber == null ? null : cb.equal(root.get("employeeNumber"), employeeNumber));
     }
 
     private static Specification<ChangeLog> memoContains(String memo) {
-        return ((root, query, criteriaBuilder) ->
-               memo == null ? null : criteriaBuilder.like(root.get("memo"), "%" + memo + "%"));
+        return ((root, query, cb) ->
+               memo == null ? null : cb.like(root.get("memo"), "%" + memo + "%"));
     }
 
     private static Specification<ChangeLog> ipAddressEq(String ipAddress) {
-        return ((root, query, criteriaBuilder) ->
-                ipAddress == null ? null : criteriaBuilder.equal(root.get("ipAddress"), "%" + ipAddress + "%"));
+        return ((root, query, cb) ->
+                ipAddress == null ? null : cb.equal(root.get("ipAddress"), "%" + ipAddress + "%"));
     }
 
     private static Specification<ChangeLog> typeEq(ChangeLogType type) {
-        return ((root, query, criteriaBuilder) ->
-                type == null ? null : criteriaBuilder.equal(root.get("type"), type));
+        return ((root, query, cb) ->
+                type == null ? null : cb.equal(root.get("type"), type));
     }
 }
