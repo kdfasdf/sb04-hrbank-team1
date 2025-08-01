@@ -31,23 +31,4 @@ public interface EmployeeMapper {
       EmployeeStatus employeeStatus,
       Department department,
       FileMetadata fileMetadata);
-
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "employeeNumber", source = "employeeNumber")
-  @Mapping(target = "status", source = "employeeStatus")
-  @Mapping(target = "department", source = "department")
-  @Mapping(target = "fileMetaData", source = "fileMetadata")
-  @Mapping(target = "name", source = "employeeCreateRequest.name")
-  @Mapping(target = "email", source = "employeeCreateRequest.email")
-  @Mapping(target = "position", source = "employeeCreateRequest.position")
-  @Mapping(target = "hireDate", source = "employeeCreateRequest.hireDate")
-  Employee toEmployee(Long id, EmployeeUpdateRequestDto employeeUpdateRequestDto,
-      String employeeNumber,
-      EmployeeStatus employeeStatus,
-      Department department,
-      FileMetadata fileMetadata);
-}
-
-
-
 }
