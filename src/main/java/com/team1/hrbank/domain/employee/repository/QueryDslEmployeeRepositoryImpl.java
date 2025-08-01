@@ -1,14 +1,17 @@
 package com.team1.hrbank.domain.employee.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.StringPath;
 import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
+import com.team1.hrbank.domain.employee.dto.request.EmployeeSortField;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 
 public class QueryDslEmployeeRepositoryImpl implements QueryDslEmployeeRepository {
 
@@ -23,13 +26,12 @@ public class QueryDslEmployeeRepositoryImpl implements QueryDslEmployeeRepositor
 
     QEmployee employee = QEmployee.employee;
 
-    String sortField = cursorPageRequestDto.sortField();
     String sortDirection = cursorPageRequestDto.sortDirection();
-
-    String nameOrEmail = cursorPageRequestDto.nameOrEmail();       // nullable
-    String departmentName = cursorPageRequestDto.departmentName(); // nullable
-    String position = cursorPageRequestDto.position();             // nullable
-    String status = cursorPageRequestDto.status();                 // nullable, String or Enum?
+    String sortField = cursorPageRequestDto.sortField();
+    String nameOrEmail = cursorPageRequestDto.nameOrEmail();
+    String departmentName = cursorPageRequestDto.departmentName();
+    String position = cursorPageRequestDto.position();
+    String status = cursorPageRequestDto.status();
 
     if (nameOrEmail == null) {
       nameOrEmail = "";
@@ -44,18 +46,13 @@ public class QueryDslEmployeeRepositoryImpl implements QueryDslEmployeeRepositor
       status = "";
     }
 
-    Order order = Order.DESC; // 기본 DESC
-    if ("ASC".equalsIgnoreCase(sortDirection)) {
-      order = Order.ASC;
-    }
+    Order order = "ASC".equalsIgnoreCase(sortDirection) ? Order.ASC : Order.DESC;
 
-    // 조건들 조합
+    // 필터 조건 조립
     BooleanBuilder where = new BooleanBuilder();
     if (!nameOrEmail.isBlank()) {
-      where.and(
-          employee.name.containsIgnoreCase(nameOrEmail)
-              .or(employee.email.containsIgnoreCase(nameOrEmail))
-      );
+      where.and(employee.name.containsIgnoreCase(nameOrEmail)
+          .or(employee.email.containsIgnoreCase(nameOrEmail)));
     }
     if (!position.isBlank()) {
       where.and(employee.position.containsIgnoreCase(position));
@@ -67,16 +64,29 @@ public class QueryDslEmployeeRepositoryImpl implements QueryDslEmployeeRepositor
       where.and(employee.department.name.containsIgnoreCase(departmentName));
     }
 
-    // 쿼리 실행
-    List<Employee> employees = queryFactory
+    Expression<?> orderPath;
+    switch (sortField) {
+      case "hireDate":
+        orderPath = employee.hireDate;
+        break;
+      case "employeeNumber":
+        orderPath = employee.employeeNumber;
+        break;
+      case "name":
+        orderPath = employee.name;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid sort field: " + sortField);
+    }
+    OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(order, orderPath);
+
+    return queryFactory
         .selectFrom(employee)
         .where(where)
-        .orderBy(order)
+        .orderBy(orderSpecifier)
         .fetch();
-
-    // ./gradlew clean build 을 터미널에서 실행하고 빌드 실패가 안뜸, 지금 서로의 코드가 맞물려 작동하지 않기 때문에 빌드가 안되서 당장은 안됨
-
-    return employees;
   }
 
+  // Qentity를 사용하기 위해선 선행적으로 터미널에서 ./gradlew clean build 실행해야 함
+  // 지금 서로의 코드가 맞물려 작동하지 않기 때문에 빌드가 안되서 당장은 안됨
 }
