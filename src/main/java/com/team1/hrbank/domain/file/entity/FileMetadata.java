@@ -28,13 +28,12 @@ public class FileMetadata extends BaseEntity {
   @Column(name = "saved_name", nullable = false, length = 100)
   private String savedName;
 
+  @Column(name = "extension", nullable = false, length = 10)
+  private String extension;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "type", nullable = false, length = 10)
   private FileType fileType;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "usage_type", nullable = false, length = 10)
-  private FileUsageType fileUsageType;
 
   @Column(name = "size", nullable = false)
   private Long fileSize;

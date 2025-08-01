@@ -1,10 +1,10 @@
-package com.team1.hrbank.domain.file.dto;
+package com.team1.hrbank.domain.file.dto.response;
 
 public record FileMetadataDto(
     String originalName,
     String savedName,
+    String extension,
     String fileType,
-    String fileUsageType,
     Long fileSize,
     String filePath
 ) {

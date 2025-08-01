@@ -2,6 +2,7 @@ package com.team1.hrbank.domain.changelog.mapper;
 
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
+import com.team1.hrbank.domain.employee.entity.Employee;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
