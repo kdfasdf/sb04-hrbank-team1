@@ -1,7 +1,7 @@
 package com.team1.hrbank.domain.changelog.service;
 
-import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDto;
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogPageResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
@@ -9,12 +9,8 @@ import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogRepository;
-import com.team1.hrbank.domain.changelog.repository.helper.ChangeLogSpecification;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,35 +28,39 @@ public class ChangeLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
 
-    public List<ChangeLogDto> findAll(ChangeLogSearchRequest request) {
-        Specification<ChangeLog> spec = ChangeLogSpecification.changeLogSpecification(request);//필터링 기준 생성
+    public ChangeLogPageResponse findAll(ChangeLogSearchRequest request) {
+        int limit = DEFAULT_PAGE_SIZE + 1;
+        List<ChangeLog> changeLogs = changeLogRepository.findAllByCondition(
+                request.employeeNumber(),
+                request.memo(),
+                request.ipAddress(),
+                request.type() != null ? request.type().name() : null,
+                request.from(),
+                request.to(),
+                request.lastId(),
+                getDirection(request.sortKey()),
+                request.sortKey().name(),
+                limit
+        );
 
-        Sort sort = switch (request.sortKey()) {
-            case CREATED_AT_ASC -> Sort.by(Sort.Direction.ASC, "createdAt");
-            case CREATED_AT_DESC -> Sort.by(Sort.Direction.DESC, "createdAt");
-            case IP_ADDRESS_ASC -> Sort.by(Sort.Direction.ASC, "ipAddress");
-            case IP_ADDRESS_DESC -> Sort.by(Sort.Direction.DESC, "ipAddress");
-        };
-
-        Sort.Direction sortDirection = switch (request.sortKey()) {
-            case CREATED_AT_ASC, IP_ADDRESS_ASC -> Sort.Direction.ASC;
-            case CREATED_AT_DESC, IP_ADDRESS_DESC -> Sort.Direction.DESC;
-        };
-
-        if (request.lastId() != null) {
-            spec = spec.and((root, query, cb) ->
-                    sortDirection == Sort.Direction.ASC
-                            ? cb.greaterThan(root.get("id"), request.lastId())
-                            : cb.lessThan(root.get("id"), request.lastId())
-            );
+        boolean hasNext = changeLogs.size() > DEFAULT_PAGE_SIZE;
+        Long nextCursor = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
+        if (hasNext) {
+            changeLogs = changeLogs.subList(0, DEFAULT_PAGE_SIZE);
         }
 
-        PageRequest pageable = PageRequest.of(0, DEFAULT_PAGE_SIZE, sort);
-        List<ChangeLog> changeLogs = changeLogRepository.findAll(spec, pageable).getContent();
+        return new ChangeLogPageResponse(
+                changeLogs.stream().map(changeLogMapper::toDto).toList(),
+                hasNext,
+                nextCursor
+        );
+    }
 
-        return changeLogs.stream()
-                .map(changeLogMapper::toDto)
-                .toList();
+    private String getDirection(ChangeLogSearchRequest.SortKey key) {
+        return switch (key) {
+            case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
+            case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
+        };
     }
 
     //새 직원 객체 생성 후 사용하시면 됩니다
