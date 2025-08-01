@@ -1,5 +1,7 @@
 package com.team1.hrbank.domain.department.service;
 
+import com.team1.hrbank.domain.department.dto.request.DepartmentSearchRequestDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
 import com.team1.hrbank.domain.department.mapper.DepartmentMapper;
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.entity.Department;
@@ -57,7 +59,8 @@ public class DepartmentService {
     return toDepartmentDto(updatedDepartment);
   }
 
-  public List<DepartmentDto> findAll() {
+  public DepartmentPageResponseDto findAll(DepartmentSearchRequestDto  departmentSearchRequestDto) {
+
     return List.of();
   }
 
