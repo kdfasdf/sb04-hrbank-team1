@@ -8,6 +8,7 @@ import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,24 +36,31 @@ public class EmployeeController {
   @PostMapping
   public ResponseEntity<EmployeeDto> createEmployee(
       @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
 
-    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile);
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
+        clientIp);
     return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
   }
 
   @PatchMapping("/{id}")
   public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
       @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
 
-    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile);
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
+        clientIp);
     return ResponseEntity.ok(employeeDto);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-    employeeService.deleteEmployee(id);
+  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
+    String clientIp = request.getRemoteAddr();
+    employeeService.deleteEmployee(id, clientIp);
     return ResponseEntity.noContent().build();
   }
 

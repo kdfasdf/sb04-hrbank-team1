@@ -1,5 +1,6 @@
 package com.team1.hrbank.domain.employee.service;
 
+import com.team1.hrbank.domain.changelog.service.ChangeLogService;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
@@ -31,10 +32,11 @@ public class EmployeeService {
   private final DepartmentRepository departmentRepository;
   private final FileMetadataService fileMetadataService;
   private final EmployeeMapper employeeMapper;
+  private final ChangeLogService changeLogService;
 
   @Transactional
   public EmployeeDto createEmployee(EmployeeCreateRequestDto employeeCreateRequestDto,
-      MultipartFile profile) {
+      MultipartFile profile, String clientIp) {
 
     validateDuplicateEmail(employeeCreateRequestDto.email());
     Department department = getValidateDepartment(employeeCreateRequestDto.departmentId());
@@ -49,44 +51,54 @@ public class EmployeeService {
         EmployeeStatus.ACTIVE, department,
         fileMetadata);
 
+    changeLogService.recordCreateLog(employee, employeeCreateRequestDto.memo(), clientIp);
+
     return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
   }
 
   @Transactional
   public EmployeeDto updateEmployee(Long employeeId,
       EmployeeUpdateRequestDto employeeUpdateRequestDto,
-      MultipartFile profile) {
+      MultipartFile profile,
+      String clientIp) {
     validateDuplicateEmail(employeeUpdateRequestDto.email());
     Department department = getValidateDepartment(employeeUpdateRequestDto.departmentId());
-    Employee employee = getValidateEmployee(employeeId);
+    Employee findEmployee = getValidateEmployee(employeeId);
+    Employee updatedEmployee = new Employee(
+        findEmployee.getEmployeeNumber(),
+        employeeUpdateRequestDto.name() == null ? findEmployee.getName()
+            : employeeUpdateRequestDto.name(),
+        employeeUpdateRequestDto.email() == null ? findEmployee.getEmail()
+            : employeeUpdateRequestDto.email(),
+        employeeUpdateRequestDto.position() == null ? findEmployee.getPosition()
+            : employeeUpdateRequestDto.position(),
+        employeeUpdateRequestDto.hireDate() == null ? findEmployee.getHireDate()
+            : employeeUpdateRequestDto.hireDate(),
+        employeeUpdateRequestDto.status() == null ? findEmployee.getStatus()
+            : EmployeeStatus.valueOf(employeeUpdateRequestDto.status()),
+        department == findEmployee.getDepartment() ? findEmployee.getDepartment() : department,
+        (profile != null && !profile.isEmpty()) ?
+            fileMetadataService.uploadProfileImage(profile) : findEmployee.getFileMetaData()
+    );
 
-    employee.setName(employeeUpdateRequestDto.name());
-    employee.setEmail(employeeUpdateRequestDto.email());
-    employee.setPosition(employeeUpdateRequestDto.position());
-    employee.setHireDate(employeeUpdateRequestDto.hireDate());
+    changeLogService.recordUpdateLog(findEmployee, updatedEmployee, employeeUpdateRequestDto.memo(),
+        clientIp);
 
-    EmployeeStatus employeeStatus = EmployeeStatus.valueOf(employeeUpdateRequestDto.status());
-    employee.setStatus(employeeStatus);
-
-    employee.setDepartment(department);
-
-    FileMetadata fileMetadata = null;
-    if (profile != null && !profile.isEmpty()) {
-      fileMetadata = fileMetadataService.uploadProfileImage(profile);
-    }
-    employee.setFileMetaData(fileMetadata);
-
-    return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
+    return employeeMapper.toEmployeeDto(employeeRepository.save(updatedEmployee));
   }
 
   @Transactional
-  public void deleteEmployee(Long employeeId) {
-    employeeRepository.deleteById(employeeId);
+  public void deleteEmployee(Long employeeId, String clientIp) {
+    Employee employee = getValidateEmployee(employeeId);
+    changeLogService.recordDeleteLog(employee, "직원 삭제", clientIp);
+    // 프로토 타입에서 확인 결과 직원 삭제는 따로 메모는 없고 일괄적으로 "직원 삭제" 란 메시지가 자동으로 들어갑니다.
+    employeeRepository.delete(employee);
   }
 
   public CursorPageResponseEmployeeDto findEmployees(CursorPageRequestDto cursorPageRequestDto) {
 
-    List<Employee> employees = employeeRepository.findAllEmployeesByRequest(cursorPageRequestDto);
+    List<Employee> employees = employeeRepository.findAllEmployeesByRequestNative(
+        cursorPageRequestDto);
     Long totalElements = (long) employees.size();
 
     int startIndex = 0;  // 다음 커서를 찾으면
@@ -136,9 +148,13 @@ public class EmployeeService {
     return new CursorPageResponseEmployeeDto(content, nextCursor, nextIdAfter, size, totalElements,
         hasNext);
   }
+  /*
+  public EmployeeDto findEmployee(Long employeeId) {
+    return employeeMapper.toEmployeeDto(employeeRepository.findById(employeeId).get());
+  }*/
 
   private String createEmployeeNumber() {
-    String prefix = "EMP"; // 직원
+    String prefix = "EMP"; // Employee 의 약자
     String year = String.valueOf(LocalDate.now().getYear()); // 연도
 
     String timestamp = String.valueOf(System.currentTimeMillis());  // 13자리
@@ -167,11 +183,8 @@ public class EmployeeService {
   }
 
   private Employee getValidateEmployee(long employeeId) {
-    Optional<Employee> employee = employeeRepository.findById(employeeId);
-    if (employee.isEmpty()) {
-      throw new IllegalArgumentException("Employee not found");
-    }
-    return employee.get();
+    return employeeRepository.findById(employeeId)
+        .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
   }
 
 }
