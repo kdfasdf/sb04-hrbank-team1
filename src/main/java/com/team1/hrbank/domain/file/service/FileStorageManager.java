@@ -36,8 +36,8 @@ public class FileStorageManager {
   }
 
   public StoredFileInfo generateBackupFile(Long backupId, String backupContent) {
-    if (backupContent == null) {
-      throw new IllegalArgumentException("백업할 내용이 없음");
+    if (backupContent == null || backupContent.trim().isEmpty()) {
+      backupContent = "ID,직원번호,이름,이메일,부서,직급,입사일,상태";
     }
     String extension = "csv";
     validateAllowedExtension(ALLOWED_BACKUP_EXTENSIONS, extension);
