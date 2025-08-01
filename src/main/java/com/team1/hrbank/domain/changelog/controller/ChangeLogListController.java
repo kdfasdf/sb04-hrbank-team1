@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/change-logs")
 public class ChangeLogListController {
-
     private final ChangeLogService changeLogService;
 
     @GetMapping
