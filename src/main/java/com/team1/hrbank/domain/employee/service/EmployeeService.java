@@ -3,26 +3,33 @@ package com.team1.hrbank.domain.employee.service;
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
+import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
+import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
-import jakarta.transaction.Transactional;
+import com.team1.hrbank.domain.file.service.FileMetadataService;
+import com.team1.hrbank.domain.file.entity.FileMetadata;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmployeeService {
 
   private final EmployeeRepository employeeRepository;
   private final DepartmentRepository departmentRepository;
-  private final FileMetaDataService fileMetaDataService;
+  private final FileMetadataService fileMetadataService;
   private final EmployeeMapper employeeMapper;
 
   @Transactional
@@ -32,17 +39,15 @@ public class EmployeeService {
     validateDuplicateEmail(employeeCreateRequestDto.email());
     Department department = getValidateDepartment(employeeCreateRequestDto.departmentId());
 
-    FileMetaData fileMetaData = null;
+    FileMetadata fileMetadata = null;
     if (profile != null && !profile.isEmpty()) {
-      fileMetaData = fileMetaDataService.createFileMetaData(profile);
+      fileMetadata = fileMetadataService.uploadProfileImage(profile);
     }
 
     String employeeNumber = createEmployeeNumber();
     Employee employee = employeeMapper.toEmployee(employeeCreateRequestDto, employeeNumber,
         EmployeeStatus.ACTIVE, department,
-        fileMetaData);
-
-    // TODO employeeCreateRequest.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
+        fileMetadata);
 
     return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
   }
@@ -65,19 +70,71 @@ public class EmployeeService {
 
     employee.setDepartment(department);
 
-    FileMetaData fileMetaData = null;
+    FileMetadata fileMetadata = null;
     if (profile != null && !profile.isEmpty()) {
-      fileMetaData = fileMetaDataService.createFileMetaData(profile);
+      fileMetadata = fileMetadataService.uploadProfileImage(profile);
     }
-    employee.setFileMetaData(fileMetaData);
+    employee.setFileMetaData(fileMetadata);
 
     return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
-    // TODO employeeUpdateRequestDto.memo() 를 사용해서 수정 로그 남기는것 추가 필요함!!
   }
 
   @Transactional
   public void deleteEmployee(Long employeeId) {
     employeeRepository.deleteById(employeeId);
+  }
+
+  public CursorPageResponseEmployeeDto findEmployees(CursorPageRequestDto cursorPageRequestDto) {
+
+    List<Employee> employees = employeeRepository.findAllEmployeesByRequest(cursorPageRequestDto);
+    Long totalElements = (long) employees.size();
+
+    int startIndex = 0;  // 다음 커서를 찾으면
+    Long idAfter = cursorPageRequestDto.idAfter(); // 이게 Long 타입이라고 가정
+
+    if (idAfter != null) {
+      for (int i = 0; i < employees.size(); i++) {
+        if (employees.get(i).getId().equals(idAfter)) {
+          startIndex = i;
+          break;
+        }
+      }
+    }
+
+    int endIndex = (employees.size() - startIndex) % cursorPageRequestDto.size() == 0
+        ? cursorPageRequestDto.size() + startIndex
+        : (employees.size() - startIndex) % cursorPageRequestDto.size() + startIndex;
+
+    List<Employee> pagedEmployees = employees.subList(startIndex, endIndex);
+    List<EmployeeDto> content = pagedEmployees.stream()
+        .map(employeeMapper::toEmployeeDto)
+        .toList();
+
+    String nextCursor = null;
+    Long nextIdAfter = null;
+    Integer size = endIndex - startIndex;
+    Boolean hasNext = null;
+
+    if (endIndex + 1 < totalElements) {
+
+      switch (cursorPageRequestDto.sortField()) {
+        case "name":
+          nextCursor = employees.get(endIndex + 1).getName();
+          break;
+        case "employeeNumber":
+          nextCursor = employees.get(endIndex + 1).getEmployeeNumber();
+          break;
+        case "hireDate":
+          nextCursor = String.valueOf(employees.get(endIndex + 1).getHireDate());
+          break;
+      }
+
+      nextIdAfter = employees.get(endIndex + 1).getId();
+      hasNext = true;
+    }
+
+    return new CursorPageResponseEmployeeDto(content, nextCursor, nextIdAfter, size, totalElements,
+        hasNext);
   }
 
   private String createEmployeeNumber() {
