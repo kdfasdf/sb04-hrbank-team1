@@ -2,6 +2,7 @@ package com.team1.hrbank.domain.employee.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
 import com.team1.hrbank.domain.department.entity.Department;
+import com.team1.hrbank.domain.file.entity.FileMetadata;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
+
 
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -53,5 +55,5 @@ public class Employee extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "metadata_id")
-  private FileMetadata fileMetaData;  // 프로필 이미지 ID
+  private FileMetadata fileMetadata;  // 프로필 이미지 ID
 }
