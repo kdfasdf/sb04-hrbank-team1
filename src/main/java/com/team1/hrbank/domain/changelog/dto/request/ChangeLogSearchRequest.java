@@ -15,7 +15,9 @@ public record ChangeLogSearchRequest(
         Long lastId //무한 스크롤 구현용
 ) {
     public enum SortKey {
-        IP_ADDRESS,
-        CREATED_AT
+        CREATED_AT_DESC,
+        CREATED_AT_ASC,
+        IP_ADDRESS_DESC,
+        IP_ADDRESS_ASC
     }
 }

@@ -6,6 +6,7 @@ import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
+import com.team1.hrbank.domain.changelog.mapper.ChangeLogMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogRepository;
 import com.team1.hrbank.domain.changelog.repository.helper.ChangeLogSpecification;
@@ -15,23 +16,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
-
 public class ChangeLogService {
 
     private final ChangeLogRepository changeLogRepository;
     private final ChangeLogDiffRepository changeLogDiffRepository;
     private final ChangeLogDiffMapper changeLogDiffMapper;
+    private final ChangeLogMapper changeLogMapper;
+
+    private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
 
     public List<ChangeLogDto> findAll(ChangeLogSearchRequest request) {
         Specification<ChangeLog> spec = ChangeLogSpecification.changeLogSpecification(request); //필터링 기준 생성
         Sort sort = switch (request.sortKey()){
-            case IP_ADDRESS -> Sort.by(Sort.Direction.DESC, "ipAddress");
-            case CREATED_AT -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case CREATED_AT_ASC -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case CREATED_AT_DESC -> Sort.by(Sort.Direction.DESC, "createdAt");
+            case IP_ADDRESS_ASC -> Sort.by(Sort.Direction.ASC, "ipAddress");
+            case IP_ADDRESS_DESC -> Sort.by(Sort.Direction.DESC, "ipAddress");
+            default -> Sort.by(Sort.Direction.ASC, "id");
         };
 
         if(request.lastId() != null){
@@ -39,12 +47,12 @@ public class ChangeLogService {
                     cb.lessThan(root.get("id"), request.lastId())); // 페이징
         }
 
-        int size = 20; //한번에 불러오는 데이터 갯수
-        PageRequest pageable = PageRequest.of(0, size, sort);
+        PageRequest pageable = PageRequest.of(0, DEFAULT_PAGE_SIZE, sort);
         List<ChangeLog> changeLogs = changeLogRepository.findAll(spec, pageable).getContent();
 
         return changeLogs.stream()
-                .
+                .map(changeLogMapper::toDto)
+                .toList();
     }
 
     //새 직원 객체 생성 후 사용하시면 됩니다
