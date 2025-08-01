@@ -41,21 +41,23 @@ public class EmployeeService {
     validateDuplicateEmail(employeeCreateRequestDto.email());
     Department department = getValidateDepartment(employeeCreateRequestDto.departmentId());
 
-    FileMetadata fileMetadata = null;
-    if (profile != null && !profile.isEmpty()) {
-      fileMetadata = fileMetadataService.uploadProfileImage(profile);
-    }
-
     String employeeNumber = createEmployeeNumber();
     Employee employee = employeeMapper.toEmployee(employeeCreateRequestDto, employeeNumber,
-        EmployeeStatus.ACTIVE, department,
-        fileMetadata);
+        EmployeeStatus.ACTIVE, department);
 
-    changeLogService.recordCreateLog(employee, employeeCreateRequestDto.memo(), clientIp);
+    Employee savedEmployee = employeeRepository.save(employee);
 
-    return employeeMapper.toEmployeeDto(employeeRepository.save(employee));
+    if (profile != null && !profile.isEmpty()) {
+      FileMetadata fileMetadata = fileMetadataService.uploadProfileImage(savedEmployee.getId(),
+          profile);
+      savedEmployee.setFileMetadata(fileMetadata);
+    }
+
+    changeLogService.recordCreateLog(savedEmployee, employeeCreateRequestDto.memo(), clientIp);
+
+    return employeeMapper.toEmployeeDto(savedEmployee);
   }
-
+  
   @Transactional
   public EmployeeDto updateEmployee(Long employeeId,
       EmployeeUpdateRequestDto employeeUpdateRequestDto,
