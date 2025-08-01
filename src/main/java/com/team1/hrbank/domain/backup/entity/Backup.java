@@ -27,18 +27,18 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Backup extends BaseEntity {
 
-    @Column(name = "worker", nullable = false, length = 15)
-    private String worker; //ip
+  @Column(name = "worker", nullable = false, length = 15)
+  private String worker; //ip
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 10)
-    private BackupStatus status;    //진행중,완료,건너뜀,실패
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false, length = 10)
+  private BackupStatus status;    //진행중,완료,건너뜀,실패
 
-    @Column(name = "endedAt", nullable = false)
-    private LocalDateTime endedAt;
+  @Column(name = "endedAt", nullable = false)
+  private LocalDateTime endedAt;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "metadata_id", nullable = false)
-    private FileMetadata metadata;
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "metadata_id", nullable = false)
+  private FileMetadata metadata;
 
 }

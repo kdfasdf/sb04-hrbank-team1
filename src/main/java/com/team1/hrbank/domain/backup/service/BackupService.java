@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +48,14 @@ public class BackupService {
       List<Employee> employees = employeeRepository.findAll();
       String employeeCsvFormat = makeEmployeeCsvFile(employees);
 
-      FileMetadata fileMetaData =fileMetaDataService.generateBackupFile(backup.getId(), employeeCsvFormat);
+      FileMetadata fileMetaData = fileMetaDataService.generateBackupFile(backup.getId(),
+          employeeCsvFormat);
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
       //Todo 백업중이던 파일 삭제 fileMetaDataService.cancelGenerateBackFile(backup.getId());
-      FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(), e.getMessage());
+      FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(),
+          e.getMessage());
       //Todo 커스텀 예외 처리 후 GlobalExceptionHandler에서 에러 응답으로 반환
     }
 
@@ -62,13 +65,13 @@ public class BackupService {
 
   private boolean shouldSkipBackup() {
     Optional<ChangeLog> recentChangeLog = changeLogRepository.findFirstByUpdatedAtDesc();
-    if(recentChangeLog.isEmpty()) {  //수정 내역 없으면 스킵
+    if (recentChangeLog.isEmpty()) {  //수정 내역 없으면 스킵
       return true;
     }
     LocalDateTime recentChangeLogTime = recentChangeLog.get().getUpdatedAt();
 
     Optional<Backup> recentBackup = backupRepository.findFirstByEndedAtDesc();
-    if(recentBackup.isEmpty()) { // 첫 백업 수행해야함
+    if (recentBackup.isEmpty()) { // 첫 백업 수행해야함
       return false;
     }
     LocalDateTime recentBackupTime = recentBackup.get().getEndedAt();
@@ -99,10 +102,11 @@ public class BackupService {
             employee.getDepartment().getId()
         )).collect(Collectors.joining("\n"));
 
-    return header + "\n" +  body;
+    return header + "\n" + body;
   }
 
-  private BackupDto saveBackup(Backup backup, FileMetadata fileMetadata, String workerIp, BackupStatus status) {
+  private BackupDto saveBackup(Backup backup, FileMetadata fileMetadata, String workerIp,
+      BackupStatus status) {
     backup.setMetadata(fileMetadata);
     backup.setStatus(status);
     backup.setEndedAt(LocalDateTime.now());
