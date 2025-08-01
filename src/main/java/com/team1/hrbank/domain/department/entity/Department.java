@@ -1,10 +1,15 @@
 package com.team1.hrbank.domain.department.entity;
 
 import com.team1.hrbank.domain.base.BaseEntity;
+import com.team1.hrbank.domain.employee.entity.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,8 +33,7 @@ public class Department extends BaseEntity {
   @Column(name = "established_date", nullable = false)
   private LocalDate establishedDate;     // 부서 설립일
 
-  /* 직원 리스트
   @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
   private List<Employee> employees = new ArrayList<>();
-   */
+
 }

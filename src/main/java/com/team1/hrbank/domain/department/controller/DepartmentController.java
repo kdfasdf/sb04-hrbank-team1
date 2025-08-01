@@ -3,10 +3,13 @@ package com.team1.hrbank.domain.department.controller;
 import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
+import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.service.DepartmentService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +37,12 @@ public class DepartmentController {
   ) {
     DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);
     return ResponseEntity.ok(department);
+  }
+
+  @GetMapping(path = "{id}")
+  public ResponseEntity<DepartmentDto> findOne(@PathVariable("id") Long id) {
+    DepartmentDto findOne = departmentService.findById(id);
+    return ResponseEntity.ok(findOne);
   }
 
 }
