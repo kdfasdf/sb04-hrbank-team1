@@ -17,6 +17,7 @@ public class FileStorageManager {
   private static final List<String> ALLOWED_BACKUP_EXTENSIONS = List.of("csv");
   private static final String PROFILE_PATH = "uploads/profile";
   private static final String BACKUP_PATH = "uploads/backup";
+  private static final String ERROR_LOG_PATH = "uploads/backup/error-log";
 
   public StoredFileInfo uploadProfileImage(Long employeeId, MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
@@ -68,6 +69,19 @@ public class FileStorageManager {
     return new StoredFileInfo(destFile, extension);
   }
 
+  public StoredFileInfo generateErrorLogFile(Long backupId, String errorLogContent) {
+    String extension = "log";
+
+    String savedName = "error_" + backupId + "_" + UUID.randomUUID() + ".log";
+    String rootPath = System.getProperty("user.dir");
+    File backupDir = new File(rootPath, ERROR_LOG_PATH);
+    ensureDirectoryExists(backupDir);
+
+    File destFile = writeLogFile(backupDir, savedName, errorLogContent);
+
+    return new StoredFileInfo(destFile, extension);
+  }
+
   private void validateOriginalFileName(String fileName) {
     if (fileName == null || !fileName.contains(".")) {
       throw new IllegalArgumentException("올바르지 않은 파일명");
@@ -107,6 +121,16 @@ public class FileStorageManager {
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("CSV 파일 저장 실패", e);
+    }
+  }
+
+  private File writeLogFile(File dir, String savedName, String errorLogContent) {
+    File destFile = new File(dir, savedName);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))) {
+      writer.write(errorLogContent);
+      return destFile;
+    } catch (IOException e) {
+      throw new RuntimeException("log 파일 저장 실패", e);
     }
   }
 }
