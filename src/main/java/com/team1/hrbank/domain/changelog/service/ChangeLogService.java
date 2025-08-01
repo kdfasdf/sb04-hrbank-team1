@@ -6,6 +6,7 @@ import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogRepository;
+import com.team1.hrbank.domain.employee.entity.Employee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
