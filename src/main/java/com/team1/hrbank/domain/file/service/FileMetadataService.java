@@ -1,9 +1,12 @@
 package com.team1.hrbank.domain.file.service;
 
+import com.team1.hrbank.domain.employee.entity.Employee;
+import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +18,21 @@ public class FileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
   private final FileStorageManager fileStorageManager;
+  private final EmployeeRepository employeeRepository;
 
   @Transactional
-  public FileMetadata uploadProfileImage(MultipartFile file) {
+  public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
+    Employee employee = employeeRepository.findById(employeeId)
+        .orElseThrow(() -> new NoSuchElementException("그런 직원 없음"));
 
-    StoredFileInfo stored = fileStorageManager.uploadProfileImage(file);
+    // 기존 이미지 삭제
+    FileMetadata oldMeta = employee.getFileMetaData();
+    if (oldMeta != null) {
+      fileStorageManager.deleteFile(oldMeta.getFilePath()); // 물리적 파일 삭제
+      fileMetadataRepository.delete(oldMeta); // DB 삭제
+    }
+
+    StoredFileInfo stored = fileStorageManager.uploadProfileImage(employeeId, file);
     FileMetadata metadata = FileMetadata.builder()
         .originalName(file.getOriginalFilename())
         .savedName(stored.file().getName())
