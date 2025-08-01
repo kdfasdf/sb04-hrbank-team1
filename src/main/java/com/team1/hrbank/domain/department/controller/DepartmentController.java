@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,6 +65,13 @@ public class DepartmentController {
     DepartmentPageResponseDto responseDto = departmentService.getDepartments(requestDto);
 
     return ResponseEntity.ok(responseDto);
+  }
+
+  @DeleteMapping(path = "{id}")
+  public ResponseEntity<DepartmentDto> delete(@PathVariable("id") Long id
+  ) {
+    departmentService.delete(id);
+  return ResponseEntity.noContent().build();
   }
 
 }

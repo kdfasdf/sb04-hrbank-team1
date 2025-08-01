@@ -11,7 +11,6 @@ import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,8 +86,17 @@ public class DepartmentService {
         .orElseThrow(() -> new NoSuchElementException("부서를 찾을 수 없습니다. ID : " + id));
   }
 
-  public void delete(long id) {
+  public void delete(Long id) {
+    Department department = departmentRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("부서를 찾을 수 없습니다. ID : " + id));
 
+    long employeeCount = employeeRepository.countByDepartmentId(department.getId());
+
+    if(employeeCount > 0) {
+      throw new IllegalArgumentException("부서에 소속된 직원이 있어 삭제할 수 없습니다. ID : " + id);
+    }
+
+    departmentRepository.delete(department);
   }
 
   // 부서별 직원 수 조회용 변환 메서드 분리
