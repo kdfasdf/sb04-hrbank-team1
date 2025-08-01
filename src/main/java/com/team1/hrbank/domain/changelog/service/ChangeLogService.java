@@ -31,7 +31,7 @@ public class ChangeLogService {
 
     @Transactional(readOnly = true)
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
-        int limit = DEFAULT_PAGE_SIZE + 1;
+        int limit = DEFAULT_PAGE_SIZE + 1; //다음 페이지 유무 판별을 위해 +1
 
         List<ChangeLog> changeLogs = changeLogRepository.findAllByConditionWithoutSort(
                 request.employeeNumber(),
@@ -43,8 +43,7 @@ public class ChangeLogService {
                 request.lastId(),
                 getDirection(request.sortKey()),
                 limit
-        );
-
+        ); //DB 조회
 
         Comparator<ChangeLog> comparator = getComparator(request.sortKey());
         changeLogs.sort(comparator);
@@ -64,13 +63,13 @@ public class ChangeLogService {
 
     private Comparator<ChangeLog> getComparator(ChangeLogSearchRequest.SortKey sortKey) {
         return switch (sortKey) {
-            case CREATED_AT_ASC -> Comparator.comparing(ChangeLog::getCreatedAt);
-            case CREATED_AT_DESC -> Comparator.comparing(ChangeLog::getCreatedAt).reversed();
-            case IP_ADDRESS_ASC -> Comparator.comparing(
+            case CREATED_AT_ASC -> Comparator.comparing(ChangeLog::getCreatedAt); // 오래된순
+            case CREATED_AT_DESC -> Comparator.comparing(ChangeLog::getCreatedAt).reversed(); // 최신순
+            case IP_ADDRESS_ASC -> Comparator.comparing( // IP 오름차순
                     ChangeLog::getIpAddress,
                     Comparator.nullsLast(String::compareToIgnoreCase)
             );
-            case IP_ADDRESS_DESC -> Comparator.comparing(
+            case IP_ADDRESS_DESC -> Comparator.comparing( // IP 내림차순
                     ChangeLog::getIpAddress,
                     Comparator.nullsLast(String::compareToIgnoreCase)
             ).reversed();
