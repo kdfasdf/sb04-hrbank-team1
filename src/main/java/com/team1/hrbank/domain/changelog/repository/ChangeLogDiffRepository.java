@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ChangeLogDiffRepository extends JpaRepository<ChangeLogDiff, Long> {
-        public List<ChangeLogDiff> findAllByChangeLogId(Long changeLogId);
+        List<ChangeLogDiff> findAllByChangeLogId(Long changeLogId);
 }

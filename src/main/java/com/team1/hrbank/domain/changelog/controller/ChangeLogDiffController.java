@@ -2,7 +2,6 @@ package com.team1.hrbank.domain.changelog.controller;
 
 import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDiffDto;
 import com.team1.hrbank.domain.changelog.service.ChangeLogDiffService;
-import com.team1.hrbank.domain.changelog.service.ChangeLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/change-logs")
 public class ChangeLogDiffController {
+
     private final ChangeLogDiffService changeLogDiffService;
 
     @GetMapping("/{changeLogId}/diffs")

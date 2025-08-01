@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ChangeLogDiffService {
     private final ChangeLogDiffRepository changeLogDiffRepository;
     private final ChangeLogDiffMapper changeLogDiffMapper;
 
+    @Transactional(readOnly = true)
     public List<ChangeLogDiffDto> findAllByChangeLogId(Long changeLogId) {
         List<ChangeLogDiff> changeLogDiffs = changeLogDiffRepository.findAllByChangeLogId(changeLogId);
         return changeLogDiffs.stream()
