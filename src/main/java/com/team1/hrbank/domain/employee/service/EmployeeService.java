@@ -62,29 +62,40 @@ public class EmployeeService {
       MultipartFile profile,
       String clientIp) {
     validateDuplicateEmail(employeeUpdateRequestDto.email());
-    Department department = getValidateDepartment(employeeUpdateRequestDto.departmentId());
+    Department newDepartment = getValidateDepartment(employeeUpdateRequestDto.departmentId());
     Employee findEmployee = getValidateEmployee(employeeId);
-    Employee updatedEmployee = new Employee(
-        findEmployee.getEmployeeNumber(),
-        employeeUpdateRequestDto.name() == null ? findEmployee.getName()
-            : employeeUpdateRequestDto.name(),
-        employeeUpdateRequestDto.email() == null ? findEmployee.getEmail()
-            : employeeUpdateRequestDto.email(),
-        employeeUpdateRequestDto.position() == null ? findEmployee.getPosition()
-            : employeeUpdateRequestDto.position(),
-        employeeUpdateRequestDto.hireDate() == null ? findEmployee.getHireDate()
-            : employeeUpdateRequestDto.hireDate(),
-        employeeUpdateRequestDto.status() == null ? findEmployee.getStatus()
-            : EmployeeStatus.valueOf(employeeUpdateRequestDto.status()),
-        department == findEmployee.getDepartment() ? findEmployee.getDepartment() : department,
-        (profile != null && !profile.isEmpty()) ?
-            fileMetadataService.uploadProfileImage(profile) : findEmployee.getFileMetaData()
-    );
+    FileMetadata fileMetadata = findEmployee.getFileMetadata();
+    Department department = findEmployee.getDepartment();
 
-    changeLogService.recordUpdateLog(findEmployee, updatedEmployee, employeeUpdateRequestDto.memo(),
+    Department oldDepartment = new Department(department.getName(),
+        department.getDescription(),
+        department.getEstablishedDate(), department.getEmployees());
+
+    FileMetadata oldFileMetadata = new FileMetadata(fileMetadata.getOriginalName(),
+        fileMetadata.getSavedName(), fileMetadata.getFilePath(), fileMetadata.getFileType(),
+        fileMetadata.getFileSize(), fileMetadata.getFilePath());
+
+    Employee oldEmployee = new Employee(
+        findEmployee.getEmployeeNumber(), findEmployee.getName(), findEmployee.getEmail(),
+        findEmployee.getPosition(), findEmployee.getHireDate(), findEmployee.getStatus(),
+        oldDepartment, oldFileMetadata);
+
+    findEmployee.setName(employeeUpdateRequestDto.name());
+    findEmployee.setEmail(employeeUpdateRequestDto.email());
+    findEmployee.setPosition(employeeUpdateRequestDto.position());
+    findEmployee.setHireDate(employeeUpdateRequestDto.hireDate());
+    findEmployee.setStatus(EmployeeStatus.valueOf(employeeUpdateRequestDto.status()));
+
+    FileMetadata newFileMetadata = fileMetadataService.uploadProfileImage(findEmployee.getId(),
+        profile);
+
+    findEmployee.setDepartment(newDepartment);
+    findEmployee.setFileMetadata(newFileMetadata);
+
+    changeLogService.recordUpdateLog(oldEmployee, findEmployee, employeeUpdateRequestDto.memo(),
         clientIp);
 
-    return employeeMapper.toEmployeeDto(employeeRepository.save(updatedEmployee));
+    return employeeMapper.toEmployeeDto(employeeRepository.save(findEmployee));
   }
 
   @Transactional
