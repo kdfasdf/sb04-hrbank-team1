@@ -1,10 +1,8 @@
 package com.team1.hrbank.domain.file.service;
 
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
-import com.team1.hrbank.domain.file.dto.response.FileMetadataDto;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
-import com.team1.hrbank.domain.file.mapper.FileMetadataMapper;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,11 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileMetadataService {
 
   private final FileMetadataRepository fileMetadataRepository;
-  private final FileMetadataMapper fileMetadataMapper;
   private final FileStorageManager fileStorageManager;
 
   @Transactional
-  public FileMetadataDto uploadProfileImage(MultipartFile file) {
+  public FileMetadata uploadProfileImage(MultipartFile file) {
 
     StoredFileInfo stored = fileStorageManager.uploadProfileImage(file);
     FileMetadata metadata = FileMetadata.builder()
@@ -32,13 +29,11 @@ public class FileMetadataService {
         .filePath(String.valueOf(stored.file().getAbsoluteFile()))
         .build();
 
-    FileMetadata savedProfileImage = fileMetadataRepository.save(metadata);
-
-    return fileMetadataMapper.toDto(savedProfileImage);
+    return fileMetadataRepository.save(metadata);
   }
 
   @Transactional
-  public FileMetadataDto generateBackupFile(Long backupId, String backupContent) {
+  public FileMetadata generateBackupFile(Long backupId, String backupContent) {
 
     StoredFileInfo stored = fileStorageManager.generateBackupFile(backupId, backupContent);
     FileMetadata metadata = FileMetadata.builder()
@@ -50,8 +45,6 @@ public class FileMetadataService {
         .filePath(String.valueOf(stored.file().getAbsoluteFile()))
         .build();
 
-    FileMetadata savedBackupFile = fileMetadataRepository.save(metadata);
-
-    return fileMetadataMapper.toDto(savedBackupFile);
+    return fileMetadataRepository.save(metadata);
   }
 }
