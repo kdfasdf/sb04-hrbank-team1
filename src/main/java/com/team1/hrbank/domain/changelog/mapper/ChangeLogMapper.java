@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "Spring")
 public interface ChangeLogMapper {
 
+    @Mapping(target = "at", source = "createdAt")
     ChangeLogDto toDto(ChangeLog changeLog);
 
     @Mapping(target = "id", ignore = true)

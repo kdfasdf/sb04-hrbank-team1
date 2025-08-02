@@ -5,8 +5,11 @@ import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDto;
 import java.util.List;
 
 public record ChangeLogSearchResponse(
-        List<ChangeLogDto> data,
-        boolean hasNext,
-        Long nextCursor
+        List<ChangeLogDto> content,
+        String nextCursor,
+        Long nextIdAfter,
+        int size,
+        Long totalElements,
+        boolean hasNext
 ) {
 }
