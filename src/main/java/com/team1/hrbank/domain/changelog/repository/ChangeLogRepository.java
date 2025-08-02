@@ -74,6 +74,16 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("to") LocalDateTime to
     );
 
+    @Query(value = """
+                SELECT COUNT(*)
+                FROM change_logs
+                WHERE created_at BETWEEN :from AND :to
+            """, nativeQuery = true)
+    long countByCreatedAtBetween(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
+
     @Query("SELECT c FROM ChangeLog c ORDER BY c.updatedAt DESC")
     Optional<ChangeLog> findFirstByUpdatedAtDesc();
 }

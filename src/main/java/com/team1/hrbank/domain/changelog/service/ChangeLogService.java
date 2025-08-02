@@ -1,6 +1,7 @@
 package com.team1.hrbank.domain.changelog.service;
 
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogCountResponse;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -31,6 +33,7 @@ public class ChangeLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
+    @Transactional(readOnly = true)
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
         int limit = DEFAULT_PAGE_SIZE + 1;
 
@@ -82,6 +85,13 @@ public class ChangeLogService {
             case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
             case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
         };
+    }
+
+    @Transactional(readOnly = true)
+    public ChangeLogCountResponse countByPeriod(LocalDateTime fromTemp, LocalDateTime toTemp) {
+        LocalDateTime from = fromTemp == null ? LocalDateTime.now().minusDays(7) : fromTemp;
+        LocalDateTime to = toTemp == null ? LocalDateTime.now() : toTemp;
+        return new ChangeLogCountResponse(changeLogRepository.countByCreatedAtBetween(from, to));
     }
 
     //새 직원 객체 생성 후 사용하시면 됩니다
