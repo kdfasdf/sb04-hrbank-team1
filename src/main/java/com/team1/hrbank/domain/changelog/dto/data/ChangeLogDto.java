@@ -12,6 +12,6 @@ public record ChangeLogDto(
         String employeeNumber,  //  대상 직원 사번
         String memo,  //  요청에 관한 간단한 메모 내용
         String ipAddress,  //  해당 요청의 IP 주소
-        LocalDateTime createdAt  //  요청 발생 시간
+        LocalDateTime at  //  요청 발생 시간
 ) {
 }

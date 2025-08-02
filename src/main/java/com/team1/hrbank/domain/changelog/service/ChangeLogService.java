@@ -1,6 +1,7 @@
 package com.team1.hrbank.domain.changelog.service;
 
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogCountResponse;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
@@ -14,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -27,13 +31,13 @@ public class ChangeLogService {
     private final ChangeLogDiffMapper changeLogDiffMapper;
     private final ChangeLogMapper changeLogMapper;
 
-    private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Transactional(readOnly = true)
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
-        int limit = DEFAULT_PAGE_SIZE + 1; //다음 페이지 유무 판별을 위해 +1
+        int limit = DEFAULT_PAGE_SIZE + 1;
 
-        List<ChangeLog> changeLogs = changeLogRepository.findAllByConditionWithoutSort(
+        List<ChangeLog> changeLogs = changeLogRepository.findAllByCondition(
                 request.employeeNumber(),
                 request.memo(),
                 request.ipAddress(),
@@ -42,45 +46,52 @@ public class ChangeLogService {
                 request.to(),
                 request.lastId(),
                 getDirection(request.sortKey()),
+                request.sortKey().name(),
                 limit
-        ); //DB 조회
-
-        Comparator<ChangeLog> comparator = getComparator(request.sortKey());
-        changeLogs.sort(comparator);
+        );
 
         boolean hasNext = changeLogs.size() > DEFAULT_PAGE_SIZE;
-        Long nextCursor = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
+        Long nextId = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
+        String nextCursor = nextId != null
+                ? Base64.getEncoder().encodeToString(("{\"id\":" + nextId + "}").getBytes(StandardCharsets.UTF_8))
+                : null;
+
         if (hasNext) {
             changeLogs = changeLogs.subList(0, DEFAULT_PAGE_SIZE);
         }
 
+        long totalCount = changeLogRepository.countByCondition(
+                request.employeeNumber(),
+                request.memo(),
+                request.ipAddress(),
+                request.type() != null ? request.type().name() : null,
+                request.from(),
+                request.to()
+        );
+
         return new ChangeLogSearchResponse(
                 changeLogs.stream().map(changeLogMapper::toDto).toList(),
-                hasNext,
-                nextCursor
+                nextCursor,
+                nextId,
+                DEFAULT_PAGE_SIZE,
+                totalCount,
+                hasNext
         );
     }
 
-    private Comparator<ChangeLog> getComparator(ChangeLogSearchRequest.SortKey sortKey) {
-        return switch (sortKey) {
-            case CREATED_AT_ASC -> Comparator.comparing(ChangeLog::getCreatedAt); // 오래된순
-            case CREATED_AT_DESC -> Comparator.comparing(ChangeLog::getCreatedAt).reversed(); // 최신순
-            case IP_ADDRESS_ASC -> Comparator.comparing( // IP 오름차순
-                    ChangeLog::getIpAddress,
-                    Comparator.nullsLast(String::compareToIgnoreCase)
-            );
-            case IP_ADDRESS_DESC -> Comparator.comparing( // IP 내림차순
-                    ChangeLog::getIpAddress,
-                    Comparator.nullsLast(String::compareToIgnoreCase)
-            ).reversed();
-        };
-    }
-
+    // 정렬 기능은 리포지토리로 이관함
     private String getDirection(ChangeLogSearchRequest.SortKey sortKey) {
         return switch (sortKey) {
             case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
             case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
         };
+    }
+
+    @Transactional(readOnly = true)
+    public ChangeLogCountResponse countByPeriod(LocalDateTime fromTemp, LocalDateTime toTemp) {
+        LocalDateTime from = fromTemp == null ? LocalDateTime.now().minusDays(7) : fromTemp;
+        LocalDateTime to = toTemp == null ? LocalDateTime.now() : toTemp;
+        return new ChangeLogCountResponse(changeLogRepository.countByCreatedAtBetween(from, to));
     }
 
     //새 직원 객체 생성 후 사용하시면 됩니다
