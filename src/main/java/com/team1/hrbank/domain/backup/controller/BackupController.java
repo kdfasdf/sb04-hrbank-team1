@@ -49,7 +49,7 @@ public class BackupController {
     return ResponseEntity.ok(response);
   }
 
-   @GetMapping("/latest")
+  @GetMapping("/latest")
   public ResponseEntity<BackupDto> getLatest(
       @RequestParam(required = false, defaultValue = "COMPLETED") String status
    ) {
