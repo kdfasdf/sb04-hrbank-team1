@@ -47,4 +47,6 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("sortKey") String sortKey,
             @Param("limit") int limit
     );
+
+    Optional<ChangeLog> findFirstByUpdatedAtDesc();
 }
