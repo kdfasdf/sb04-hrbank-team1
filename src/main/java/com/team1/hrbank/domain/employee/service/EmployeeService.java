@@ -185,8 +185,7 @@ public class EmployeeService {
   }
 
   // 대시보드
-  @Transactional
-  public int countEmployees(EmployeeStatus status, LocalDate fromDate, LocalDate toDate) {
+  public long countEmployees(EmployeeStatus status, LocalDate fromDate, LocalDate toDate) {
     if (fromDate != null && toDate == null) {
       toDate = LocalDate.now();
     }
