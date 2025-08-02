@@ -1,5 +1,6 @@
 package com.team1.hrbank.domain.file.service;
 
+import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,10 +54,9 @@ public class FileStorageManager {
     }
   }
 
-  public StoredFileInfo generateBackupFile(Long backupId, String backupContent) {
-    if (backupContent == null || backupContent.trim().isEmpty()) {
-      backupContent = "ID,직원번호,이름,이메일,부서,직급,입사일,상태";
-    }
+  public StoredFileInfo generateBackupFile(Long backupId, List<Employee> employees) {
+    String backupContent = "ID,직원번호,이름,이메일,부서,직급,입사일,상태";
+
     String extension = "csv";
     validateAllowedExtension(ALLOWED_BACKUP_EXTENSIONS, extension);
 
@@ -66,7 +66,7 @@ public class FileStorageManager {
     File backupDir = new File(rootPath, BACKUP_PATH);
     ensureDirectoryExists(backupDir);
 
-    File destFile = writeCsvFile(backupDir, savedName, backupContent);
+    File destFile = writeCsvFile(backupDir, savedName,employees);
 
     return new StoredFileInfo(destFile, extension);
   }
@@ -125,10 +125,20 @@ public class FileStorageManager {
     }
   }
 
-  private File writeCsvFile(File dir, String savedName, String backupContent) {
+  private File writeCsvFile(File dir, String savedName, List<Employee> employees) {
     File destFile = new File(dir, savedName);
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))) {
-      writer.write(backupContent);
+      for(Employee employee : employees) {
+        writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
+            employee.getId(),
+            employee.getEmployeeNumber(),
+            employee.getName(), employee.getEmail(),
+            employee.getDepartment().getName(),
+            employee.getPosition(),
+            employee.getHireDate().toString(),
+            employee.getStatus().name()));
+        writer.newLine();
+      }
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("CSV 파일 저장 실패", e);

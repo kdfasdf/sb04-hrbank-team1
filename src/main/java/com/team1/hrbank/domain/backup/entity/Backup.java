@@ -39,6 +39,6 @@ public class Backup extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "metadata_id", nullable = false)
-  private FileMetadata metadata;
+  private FileMetadata fileMetadata;
 
 }
