@@ -48,4 +48,12 @@ public class BackupController {
     CursorPageResponseBackupDto response = backupService.findAll(worker, status, startedAtFrom, startedAtTo, idAfter, cursor, size, sortField, sortDirection);
     return ResponseEntity.ok(response);
   }
+
+   @GetMapping("/lateest")
+  public ResponseEntity<BackupDto> getLatest(
+      @RequestParam(required = false, defaultValue = "COMPLETED") String status
+   ) {
+    return ResponseEntity.ok(backupService.findLatest(status));
+   }
+
 }

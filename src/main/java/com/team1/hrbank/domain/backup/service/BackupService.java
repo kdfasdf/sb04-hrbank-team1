@@ -13,8 +13,6 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -205,6 +203,13 @@ public class BackupService {
         "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
     Sort sort = Sort.by(direction, sortField);
     return PageRequest.of(0, size, sort);
+  }
+
+  @Transactional(readOnly = true)
+  public BackupDto findLatest(String status) {
+    Backup backup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status)
+        .orElseThrow(() -> new IllegalStateException("최신 백업 상태 없음"));
+    return backMapper.toDto(backup);
   }
 }
 
