@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/change-logs")
-public class ChangeLogListController {
+public class ChangeLogController {
 
     private final ChangeLogService changeLogService;
     private final ChangeLogDiffService changeLogDiffService;
