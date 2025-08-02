@@ -1,6 +1,6 @@
 package com.team1.hrbank.domain.changelog.controller;
 
-import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDiffDto;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogDiffResponse;
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogCountResponse;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
@@ -31,8 +31,8 @@ public class ChangeLogListController {
     }
 
     @GetMapping("/{changeLogId}/diffs")
-    public ResponseEntity<List<ChangeLogDiffDto>> getDiffs(@PathVariable Long changeLogId) {
-        List<ChangeLogDiffDto> diffs = changeLogDiffService.findAllByChangeLogId(changeLogId);
+    public ResponseEntity<List<ChangeLogDiffResponse>> getDiffs(@PathVariable Long changeLogId) {
+        List<ChangeLogDiffResponse> diffs = changeLogDiffService.findAllByChangeLogId(changeLogId);
         return ResponseEntity.ok(diffs);
     }
 

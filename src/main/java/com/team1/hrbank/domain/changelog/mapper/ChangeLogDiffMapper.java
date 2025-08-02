@@ -1,12 +1,11 @@
 package com.team1.hrbank.domain.changelog.mapper;
 
-import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDiffDto;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogDiffResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public interface ChangeLogDiffMapper {
 
     @Mapping(source = "beforeValue", target = "before")
     @Mapping(source = "afterValue", target = "after")
-    ChangeLogDiffDto toDto(ChangeLogDiff changeLogDiff);
+    ChangeLogDiffResponse toDto(ChangeLogDiff changeLogDiff);
 
     default List<ChangeLogDiff> fromCreate(ChangeLog log, Employee after) {
         return List.of(

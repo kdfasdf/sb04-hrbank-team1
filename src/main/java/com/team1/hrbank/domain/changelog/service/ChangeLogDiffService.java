@@ -1,6 +1,6 @@
 package com.team1.hrbank.domain.changelog.service;
 
-import com.team1.hrbank.domain.changelog.dto.data.ChangeLogDiffDto;
+import com.team1.hrbank.domain.changelog.dto.response.ChangeLogDiffResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
@@ -17,7 +17,7 @@ public class ChangeLogDiffService {
     private final ChangeLogDiffMapper changeLogDiffMapper;
 
     @Transactional(readOnly = true)
-    public List<ChangeLogDiffDto> findAllByChangeLogId(Long changeLogId) {
+    public List<ChangeLogDiffResponse> findAllByChangeLogId(Long changeLogId) {
         List<ChangeLogDiff> changeLogDiffs = changeLogDiffRepository.findAllByChangeLogId(changeLogId);
         return changeLogDiffs.stream()
                 .map(changeLogDiffMapper::toDto)
