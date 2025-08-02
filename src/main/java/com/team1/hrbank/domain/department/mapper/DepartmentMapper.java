@@ -10,11 +10,14 @@ import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface DepartmentMapper {
+
   @Mapping(target = "employees", ignore = true)
   Department toEntity(DepartmentCreateRequestDto departmentCreateRequestDto);
+
   @Mapping(target = "employees", ignore = true)
   Department toEntity(Long id, DepartmentUpdateRequestDto departmentUpdateRequestDto);
-  @Mapping(target = "employeeCount", source = "." ,qualifiedByName = "mapEmployeeCount")
+
+  @Mapping(target = "employeeCount", source = ".", qualifiedByName = "mapEmployeeCount")
   DepartmentDto toDepartmentDto(Department departmentEntity);
 
   //직원 수 계산 로직 (null-safe)

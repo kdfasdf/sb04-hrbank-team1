@@ -1,5 +1,7 @@
 package com.team1.hrbank.domain.department.service;
 
+import com.team1.hrbank.domain.department.dto.request.DepartmentSearchRequestDto;
+import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
 import com.team1.hrbank.domain.department.mapper.DepartmentMapper;
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.entity.Department;
@@ -9,7 +11,6 @@ import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,8 +58,26 @@ public class DepartmentService {
     return toDepartmentDto(updatedDepartment);
   }
 
-  public List<DepartmentDto> findAll() {
-    return List.of();
+  @Transactional(readOnly = true)
+  public DepartmentPageResponseDto getDepartments(
+      DepartmentSearchRequestDto departmentSearchRequestDto) {
+    List<DepartmentDto> content = departmentRepository.searchDepartments(
+        departmentSearchRequestDto);
+
+    Long nextIdAfter = content.isEmpty() ? null : content.get(content.size() - 1).id();
+    boolean hasNextPage = content.size() == (departmentSearchRequestDto.size() != null ? departmentSearchRequestDto.size() : 10);
+
+    long totalElements = departmentRepository.countDepartments((departmentSearchRequestDto.nameOrDescription()));
+
+    String nextCursor = nextIdAfter != null ? nextIdAfter.toString() : null;
+    return new DepartmentPageResponseDto(
+        content,
+        nextCursor,
+        nextIdAfter,
+        departmentSearchRequestDto.size() != null ? departmentSearchRequestDto.size() : 10,
+        totalElements,
+        hasNextPage
+    );
   }
 
   @Transactional(readOnly = true)
