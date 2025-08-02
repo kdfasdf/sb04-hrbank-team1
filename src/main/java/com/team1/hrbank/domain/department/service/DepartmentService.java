@@ -11,7 +11,6 @@ import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

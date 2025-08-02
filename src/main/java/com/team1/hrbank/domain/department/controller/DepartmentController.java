@@ -5,9 +5,7 @@ import com.team1.hrbank.domain.department.dto.request.DepartmentUpdateRequestDto
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
-import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.service.DepartmentService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
