@@ -9,4 +9,6 @@ public interface BackupRepository extends JpaRepository<Backup, Long>,
     JpaSpecificationExecutor<Backup> {
 
   Optional<Backup> findFirstByEndedAtDesc();
+
+  Optional<Backup> findFirstByStatusOrderByStartedAtDesc(String status);
 }
