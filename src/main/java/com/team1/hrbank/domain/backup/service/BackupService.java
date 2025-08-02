@@ -91,7 +91,7 @@ public class BackupService {
 
   private BackupDto saveBackup(Backup backup, FileMetadata fileMetadata, String workerIp,
       BackupStatus status) {
-    backup.setMetadata(fileMetadata);
+    backup.setFileMetadata(fileMetadata);
     backup.setStatus(status);
     backup.setEndedAt(LocalDateTime.now());
     backup.setWorker(workerIp);
