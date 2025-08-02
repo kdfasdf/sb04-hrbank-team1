@@ -27,17 +27,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
   @Query("""
           SELECT COUNT(e) FROM Employee e
           WHERE e.status = :status
-            AND e.hireDate BETWEEN :fromDate AND :toDate
-      """)
-  int countByStatusAndHireDate(
-      @Param("status") EmployeeStatus status,
-      @Param("fromDate") LocalDate fromDate,
-      @Param("toDate") LocalDate toDate
-  );
-
-  @Query("""
-          SELECT COUNT(e) FROM Employee e
-          WHERE e.status = :status
       """)
   int countByStatus(@Param("status") EmployeeStatus status);
 
@@ -53,5 +42,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
   @Query("""
       SELECT COUNT(e) FROM Employee e
       """)
-  int countAll();
+  int countAll ();
 }

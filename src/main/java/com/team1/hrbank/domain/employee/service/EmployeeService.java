@@ -191,15 +191,11 @@ public class EmployeeService {
       toDate = LocalDate.now();
     }
 
-    if (status != null && fromDate != null && toDate != null) {
-      return employeeRepository.countByStatusAndHireDate(status, fromDate, toDate);
-    }
-
-    if (status != null) {
+    if (status != null && fromDate == null && toDate == null) {
       return employeeRepository.countByStatus(status);
     }
 
-    if (fromDate != null && toDate != null) {
+    if (status == null && fromDate != null) {
       return employeeRepository.countByHireDate(fromDate, toDate);
     }
 
