@@ -42,5 +42,6 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("limit") int limit
     );
 
+    @Query("SELECT c FROM ChangeLog c ORDER BY c.updatedAt DESC")
     Optional<ChangeLog> findFirstByUpdatedAtDesc();
 }
