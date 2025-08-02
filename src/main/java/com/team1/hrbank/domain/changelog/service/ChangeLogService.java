@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -28,9 +29,11 @@ public class ChangeLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 20; //한번에 불러오는 데이터 갯수
 
+    @Transactional(readOnly = true)
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
-        int limit = DEFAULT_PAGE_SIZE + 1;
-        List<ChangeLog> changeLogs = changeLogRepository.findAllByCondition(
+        int limit = DEFAULT_PAGE_SIZE + 1; //다음 페이지 유무 판별을 위해 +1
+
+        List<ChangeLog> changeLogs = changeLogRepository.findAllByConditionWithoutSort(
                 request.employeeNumber(),
                 request.memo(),
                 request.ipAddress(),
@@ -39,9 +42,11 @@ public class ChangeLogService {
                 request.to(),
                 request.lastId(),
                 getDirection(request.sortKey()),
-                request.sortKey().name(),
                 limit
-        );
+        ); //DB 조회
+
+        Comparator<ChangeLog> comparator = getComparator(request.sortKey());
+        changeLogs.sort(comparator);
 
         boolean hasNext = changeLogs.size() > DEFAULT_PAGE_SIZE;
         Long nextCursor = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
@@ -56,8 +61,23 @@ public class ChangeLogService {
         );
     }
 
-    private String getDirection(ChangeLogSearchRequest.SortKey key) {
-        return switch (key) {
+    private Comparator<ChangeLog> getComparator(ChangeLogSearchRequest.SortKey sortKey) {
+        return switch (sortKey) {
+            case CREATED_AT_ASC -> Comparator.comparing(ChangeLog::getCreatedAt); // 오래된순
+            case CREATED_AT_DESC -> Comparator.comparing(ChangeLog::getCreatedAt).reversed(); // 최신순
+            case IP_ADDRESS_ASC -> Comparator.comparing( // IP 오름차순
+                    ChangeLog::getIpAddress,
+                    Comparator.nullsLast(String::compareToIgnoreCase)
+            );
+            case IP_ADDRESS_DESC -> Comparator.comparing( // IP 내림차순
+                    ChangeLog::getIpAddress,
+                    Comparator.nullsLast(String::compareToIgnoreCase)
+            ).reversed();
+        };
+    }
+
+    private String getDirection(ChangeLogSearchRequest.SortKey sortKey) {
+        return switch (sortKey) {
             case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
             case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
         };
