@@ -15,7 +15,6 @@ import com.team1.hrbank.domain.file.service.FileMetadataService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,14 +51,13 @@ public class BackupService {
 
     try {
       List<Employee> employees = employeeRepository.findAll();
-      String employeeCsvFormat = makeEmployeeCsvFile(employees);
 
       FileMetadata fileMetaData = fileMetaDataService.generateBackupFile(backup.getId(),
-          employeeCsvFormat);
+          employees);
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
-      //Todo 백업중이던 파일 삭제 fileMetaDataService.cancelGenerateBackFile(backup.getId());
+      fileMetaDataService.cancelGenerateBackupFile(backup.getId());
       FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(),
           e.getMessage());
       //Todo 커스텀 예외 처리 후 GlobalExceptionHandler에서 에러 응답으로 반환
@@ -76,7 +74,7 @@ public class BackupService {
     }
     LocalDateTime recentChangeLogTime = recentChangeLog.get().getUpdatedAt();
 
-    Optional<Backup> recentBackup = backupRepository.findFirstByEndedAtDesc();
+    Optional<Backup> recentBackup = backupRepository.findFirstOrderByEndedAtDesc();
     if (recentBackup.isEmpty()) { // 첫 백업 수행해야함
       return false;
     }
@@ -91,29 +89,9 @@ public class BackupService {
     return backMapper.toDto(backup);
   }
 
-
-  // Todo OOM 이슈 발생 가능성 있으니 책임 이관 예정
-  private String makeEmployeeCsvFile(List<Employee> employees) {
-    String header = "id,employNumber,name,email,position,hireDate,status,departmentId";
-
-    String body = employees.stream()
-        .map(employee -> String.format("%s,%s,%s,%s,%s,%s,%s,%s",
-            employee.getId(),
-            employee.getEmployeeNumber(),
-            employee.getName(),
-            employee.getEmail(),
-            employee.getPosition(),
-            employee.getHireDate(),
-            employee.getStatus(),
-            employee.getDepartment().getId()
-        )).collect(Collectors.joining("\n"));
-
-    return header + "\n" + body;
-  }
-
   private BackupDto saveBackup(Backup backup, FileMetadata fileMetadata, String workerIp,
       BackupStatus status) {
-    backup.setMetadata(fileMetadata);
+    backup.setFileMetadata(fileMetadata);
     backup.setStatus(status);
     backup.setEndedAt(LocalDateTime.now());
     backup.setWorker(workerIp);
