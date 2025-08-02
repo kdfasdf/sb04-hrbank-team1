@@ -2,6 +2,7 @@ package com.team1.hrbank.domain.employee.repository;
 
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -21,4 +22,36 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
   // JOIN FETCH 대체용
   @EntityGraph(attributePaths = {"department", "fileMetaData"})
   Optional<Employee> findById(Long id);
+
+  // 대시보드
+  @Query("""
+          SELECT COUNT(e) FROM Employee e
+          WHERE e.status = :status
+            AND e.hireDate BETWEEN :fromDate AND :toDate
+      """)
+  int countByStatusAndHireDate(
+      @Param("status") EmployeeStatus status,
+      @Param("fromDate") LocalDate fromDate,
+      @Param("toDate") LocalDate toDate
+  );
+
+  @Query("""
+          SELECT COUNT(e) FROM Employee e
+          WHERE e.status = :status
+      """)
+  int countByStatus(@Param("status") EmployeeStatus status);
+
+  @Query("""
+      SELECT COUNT(e) FROM Employee e
+          WHERE e.hireDate BETWEEN :fromDate AND :toDate
+      """)
+  int countByHireDate(
+      @Param("fromDate") LocalDate fromDate,
+      @Param("toDate") LocalDate toDate
+  );
+
+  @Query("""
+      SELECT COUNT(e) FROM Employee e
+      """)
+  int countAll();
 }

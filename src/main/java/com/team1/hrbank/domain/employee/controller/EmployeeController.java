@@ -6,11 +6,15 @@ import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
+import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,5 +80,19 @@ public class EmployeeController {
   public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
     EmployeeDto employeeDto = employeeService.findEmployee(id);
     return ResponseEntity.ok(employeeDto);
+  }
+
+  // 대시보드
+  @GetMapping("/count")
+  public ResponseEntity<Integer> countEmployees(
+      @RequestParam(required = false) EmployeeStatus status,
+      @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate fromDate,
+      @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate toDate) {
+
+    int employeesCount = employeeService.countEmployees(status, fromDate, toDate);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(employeesCount);
   }
 }

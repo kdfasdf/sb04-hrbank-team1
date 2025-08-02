@@ -184,6 +184,29 @@ public class EmployeeService {
     return employeeNumber;
   }
 
+  // 대시보드
+  @Transactional
+  public int countEmployees(EmployeeStatus status, LocalDate fromDate, LocalDate toDate) {
+    if (fromDate != null && toDate == null) {
+      toDate = LocalDate.now();
+    }
+
+    if (status != null && fromDate != null && toDate != null) {
+      return employeeRepository.countByStatusAndHireDate(status, fromDate, toDate);
+    }
+
+    if (status != null) {
+      return employeeRepository.countByStatus(status);
+    }
+
+    if (fromDate != null && toDate != null) {
+      return employeeRepository.countByHireDate(fromDate, toDate);
+    }
+
+    return employeeRepository.countAll();
+  }
+
+  // 공통 메서드
   private Department getValidateDepartment(Long departmentId) {
     return departmentRepository.findById(departmentId)
         .orElseThrow(() -> new IllegalArgumentException("Department not found"));
