@@ -2,18 +2,25 @@ package com.team1.hrbank.domain.employee.controller;
 
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
+import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
+import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Employee", description = "직원 관리 API")
-@RequestMapping("/api/employee")
+@RequestMapping("/api/employees")
 public class EmployeeController {
 
   private final EmployeeService employeeService;
@@ -29,24 +36,45 @@ public class EmployeeController {
   @PostMapping
   public ResponseEntity<EmployeeDto> createEmployee(
       @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
 
-    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile);
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
+        clientIp);
     return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
   }
 
   @PatchMapping("/{id}")
   public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
       @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
 
-    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile);
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
+        clientIp);
     return ResponseEntity.ok(employeeDto);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-    employeeService.deleteEmployee(id);
+  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
+    String clientIp = request.getRemoteAddr();
+    employeeService.deleteEmployee(id, clientIp);
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping
+  public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
+      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
+    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
+        cursorPageRequestDto);
+    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
+    EmployeeDto employeeDto = employeeService.findEmployee(id);
+    return ResponseEntity.ok(employeeDto);
   }
 }

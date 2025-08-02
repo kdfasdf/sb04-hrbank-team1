@@ -14,6 +14,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
 
+
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,5 +55,5 @@ public class Employee extends BaseEntity {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "metadata_id")
-  private FileMetadata fileMetaData;  // 프로필 이미지 ID
+  private FileMetadata fileMetadata;  // 프로필 이미지 ID
 }

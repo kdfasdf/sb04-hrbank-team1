@@ -1,6 +1,7 @@
 package com.team1.hrbank.domain.backup.service;
 
 import com.team1.hrbank.domain.backup.dto.response.BackupDto;
+import com.team1.hrbank.domain.backup.dto.response.CursorPageResponseBackupDto;
 import com.team1.hrbank.domain.backup.entity.Backup;
 import com.team1.hrbank.domain.backup.entity.BackupStatus;
 import com.team1.hrbank.domain.backup.mapper.BackupMapper;
@@ -12,10 +13,17 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,4 +122,89 @@ public class BackupService {
     backupRepository.save(backup);
     return backMapper.toDto(backup);
   }
+
+  @Transactional(readOnly = true)
+  public CursorPageResponseBackupDto findAll(
+      String worker,
+      BackupStatus status,
+      LocalDateTime startedAtFrom,
+      LocalDateTime startedAtTo,
+      Long idAfter,
+      String cursor,          // startedAt이나 endedAt의 시간 값
+      Integer size,
+      String sortField,      // "startedAt or endedAt"
+      String sortDirection   // "asc" or "desc"
+  ) {
+
+    Specification<Backup> spec = createSpec(worker, status, startedAtFrom, startedAtTo, idAfter);
+    Pageable pageable = createPageable(size, sortField, sortDirection);
+
+    Page<Backup> backupPage;
+    if (spec == null) {
+      backupPage = backupRepository.findAll(pageable);
+    } else {
+      backupPage = backupRepository.findAll(spec, pageable);
+    }
+
+    Long nextIdAfter = null;
+    String nextCursor = null;
+
+    List<BackupDto> backupDtos = backupPage.getContent().stream()
+        .map(backMapper::toDto)
+        .toList();
+
+    if (!backupDtos.isEmpty()) {
+      nextIdAfter = backupDtos.get(backupDtos.size() - 1).id();
+      nextCursor = sortField.equals("startedAt") ?
+          backupDtos.get(backupDtos.size() - 1).startedAt().toString() :
+          backupDtos.get(backupDtos.size() - 1).endedAt().toString();
+    }
+
+    return new CursorPageResponseBackupDto(
+        backupDtos,
+        nextCursor,
+        nextIdAfter,
+        backupPage.getSize(),
+        backupPage.getTotalElements(),
+        backupPage.hasNext()
+    );
+  }
+
+  private Specification<Backup> createSpec(String worker, BackupStatus status,
+      LocalDateTime startedAtFrom, LocalDateTime startedAtTo, Long idAfter) {
+    Specification<Backup> spec = Specification.where(null);
+
+    if (worker != null && !worker.isEmpty()) {
+      spec = spec.and((root, query, cb) ->
+          cb.like(root.get("worker"), "%" + worker + "%"));
+    }
+
+    if (status != null) {
+      spec = spec.and((root, query, cb) ->
+          cb.equal(root.get("status"), status));
+    }
+
+    if (startedAtFrom != null) {
+      spec = spec.and((root, query, cb) ->
+          cb.greaterThanOrEqualTo(root.get("startedAt"), startedAtFrom));
+    }
+
+    if (startedAtTo != null) {
+      spec = spec.and((root, query, cb) ->
+          cb.lessThanOrEqualTo(root.get("startedAt"), startedAtTo));
+    }
+
+    if (idAfter != null) {
+      spec = spec.and((root, query, cb) -> cb.greaterThan(root.get("id"), idAfter));
+    }
+    return spec;
+  }
+
+  private Pageable createPageable(Integer size, String sortField, String sortDirection) {
+    Sort.Direction direction =
+        "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+    Sort sort = Sort.by(direction, sortField);
+    return PageRequest.of(0, size, sort);
+  }
 }
+
