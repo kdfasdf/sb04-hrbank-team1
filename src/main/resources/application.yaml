@@ -1,3 +1,7 @@
 spring:
   profiles:
-    active : dev
+    active : prod
+
+backup:
+  batch:
+    rate: 3600000
