@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -80,6 +82,15 @@ public class FileStorageManager {
     File destFile = writeLogFile(backupDir, savedName, errorLogContent);
 
     return new StoredFileInfo(destFile, extension);
+  }
+
+  public Resource downloadFile(String filePath) {
+    File file = new File(filePath);
+    if (!file.exists()) {
+      throw new RuntimeException("파일 없음: " + filePath);
+    }
+
+    return new FileSystemResource(file);
   }
 
   private void validateOriginalFileName(String fileName) {
