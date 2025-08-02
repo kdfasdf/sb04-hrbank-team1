@@ -54,9 +54,9 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
         FROM departments d
         WHERE (
             ?1 IS NULL
-            OR LOWER(d.name) LIKE LOWER(:keywordPattern)
-            OR LOWER(d.description) LIKE LOWER(:keywordPattern)
-            )
+            OR LOWER(d.name) LIKE LOWER(?1)
+            OR LOWER(d.description) LIKE LOWER(?1)
+        )
         """;
 
     Query query = em.createNativeQuery(countQuery);
