@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -39,50 +38,50 @@ public class EmployeeController {
 
   private final EmployeeService employeeService;
 
-//  @PostMapping
-//  public ResponseEntity<EmployeeDto> createEmployee(
-//      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
-//      @RequestPart(value = "profile", required = false) MultipartFile profile,
-//      HttpServletRequest request) {
-//
-//    String clientIp = request.getRemoteAddr();
-//    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
-//        clientIp);
-//    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
-//  }
-//
-//  @PatchMapping("/{id}")
-//  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
-//      @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
-//      @RequestPart(value = "profile", required = false) MultipartFile profile,
-//      HttpServletRequest request) {
-//
-//    String clientIp = request.getRemoteAddr();
-//    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
-//        clientIp);
-//    return ResponseEntity.ok(employeeDto);
-//  }
-//
-//  @DeleteMapping("/{id}")
-//  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
-//    String clientIp = request.getRemoteAddr();
-//    employeeService.deleteEmployee(id, clientIp);
-//    return ResponseEntity.noContent().build();
-//  }
-//
-//  @GetMapping
-//  public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
-//      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
-//    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
-//        cursorPageRequestDto);
-//    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
-//  }
-//
-//  @GetMapping("/{id}")
-//  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
-//    EmployeeDto employeeDto = employeeService.findEmployee(id);
-//    return ResponseEntity.ok(employeeDto);
-//  }
+  @PostMapping
+  public ResponseEntity<EmployeeDto> createEmployee(
+      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
+
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
+        clientIp);
+    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
+  }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
+      @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      HttpServletRequest request) {
+
+    String clientIp = request.getRemoteAddr();
+    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
+        clientIp);
+    return ResponseEntity.ok(employeeDto);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
+    String clientIp = request.getRemoteAddr();
+    employeeService.deleteEmployee(id, clientIp);
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping
+  public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
+      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
+    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
+        cursorPageRequestDto);
+    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
+    EmployeeDto employeeDto = employeeService.findEmployee(id);
+    return ResponseEntity.ok(employeeDto);
+  }
 
   // 대시보드
   @GetMapping("/count")
