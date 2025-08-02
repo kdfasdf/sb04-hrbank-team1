@@ -57,7 +57,7 @@ public class BackupService {
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
-      //Todo 백업중이던 파일 삭제 fileMetaDataService.cancelGenerateBackFile(backup.getId());
+      fileMetaDataService.cancelGenerateBackupFile(backup.getId());
       FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(),
           e.getMessage());
       //Todo 커스텀 예외 처리 후 GlobalExceptionHandler에서 에러 응답으로 반환
