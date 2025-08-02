@@ -84,12 +84,12 @@ public class EmployeeController {
 
   // 대시보드
   @GetMapping("/count")
-  public ResponseEntity<Integer> countEmployees(
+  public ResponseEntity<Long> countEmployees(
       @RequestParam(required = false) EmployeeStatus status,
       @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate fromDate,
       @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate toDate) {
 
-    int employeesCount = employeeService.countEmployees(status, fromDate, toDate);
+    long employeesCount = employeeService.countEmployees(status, fromDate, toDate);
 
     return ResponseEntity
         .status(HttpStatus.OK)
