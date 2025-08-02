@@ -28,7 +28,7 @@ public class FileMetadataService {
         .orElseThrow(() -> new NoSuchElementException("그런 직원 없음"));
 
     // 기존 이미지 삭제
-    FileMetadata oldMeta = employee.getFileMetaData();
+    FileMetadata oldMeta = employee.getFileMetadata();
     if (oldMeta != null) {
       fileStorageManager.deleteFile(oldMeta.getFilePath()); // 물리적 파일 삭제
       fileMetadataRepository.delete(oldMeta); // DB 삭제
