@@ -6,6 +6,7 @@ import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
+import com.team1.hrbank.domain.employee.dto.response.EmployeeDistributionDto;
 import com.team1.hrbank.domain.employee.dto.response.EmployeeTrendDto;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.entity.TimeUnitType;
@@ -38,50 +39,50 @@ public class EmployeeController {
 
   private final EmployeeService employeeService;
 
-  @PostMapping
-  public ResponseEntity<EmployeeDto> createEmployee(
-      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile,
-      HttpServletRequest request) {
-
-    String clientIp = request.getRemoteAddr();
-    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
-        clientIp);
-    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
-  }
-
-  @PatchMapping("/{id}")
-  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
-      @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
-      @RequestPart(value = "profile", required = false) MultipartFile profile,
-      HttpServletRequest request) {
-
-    String clientIp = request.getRemoteAddr();
-    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
-        clientIp);
-    return ResponseEntity.ok(employeeDto);
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
-    String clientIp = request.getRemoteAddr();
-    employeeService.deleteEmployee(id, clientIp);
-    return ResponseEntity.noContent().build();
-  }
-
-  @GetMapping
-  public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
-      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
-    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
-        cursorPageRequestDto);
-    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
-    EmployeeDto employeeDto = employeeService.findEmployee(id);
-    return ResponseEntity.ok(employeeDto);
-  }
+//  @PostMapping
+//  public ResponseEntity<EmployeeDto> createEmployee(
+//      @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
+//      @RequestPart(value = "profile", required = false) MultipartFile profile,
+//      HttpServletRequest request) {
+//
+//    String clientIp = request.getRemoteAddr();
+//    EmployeeDto employeeDto = employeeService.createEmployee(employeeCreateRequestDto, profile,
+//        clientIp);
+//    return ResponseEntity.status(HttpStatus.CREATED).body(employeeDto);
+//  }
+//
+//  @PatchMapping("/{id}")
+//  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
+//      @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
+//      @RequestPart(value = "profile", required = false) MultipartFile profile,
+//      HttpServletRequest request) {
+//
+//    String clientIp = request.getRemoteAddr();
+//    EmployeeDto employeeDto = employeeService.updateEmployee(id, employeeUpdateRequestDto, profile,
+//        clientIp);
+//    return ResponseEntity.ok(employeeDto);
+//  }
+//
+//  @DeleteMapping("/{id}")
+//  public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
+//    String clientIp = request.getRemoteAddr();
+//    employeeService.deleteEmployee(id, clientIp);
+//    return ResponseEntity.noContent().build();
+//  }
+//
+//  @GetMapping
+//  public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
+//      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
+//    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
+//        cursorPageRequestDto);
+//    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
+//  }
+//
+//  @GetMapping("/{id}")
+//  public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
+//    EmployeeDto employeeDto = employeeService.findEmployee(id);
+//    return ResponseEntity.ok(employeeDto);
+//  }
 
   // 대시보드
   @GetMapping("/count")
@@ -109,5 +110,19 @@ public class EmployeeController {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(trend);
+  }
+
+  @GetMapping("/status/distribution")
+  public ResponseEntity<List<EmployeeDistributionDto>> statusDistributionEmployees(
+      @RequestParam(required = false, defaultValue = "department") String groupBy,
+      @RequestParam(required = false, defaultValue = "ACTIVE") EmployeeStatus status
+  ) {
+
+    List<EmployeeDistributionDto> distribution = employeeService.getEmployeeDistribution(groupBy,
+        status);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(distribution);
   }
 }

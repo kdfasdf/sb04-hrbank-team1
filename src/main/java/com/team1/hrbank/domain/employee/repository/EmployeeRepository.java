@@ -1,8 +1,10 @@
 package com.team1.hrbank.domain.employee.repository;
 
+import com.team1.hrbank.domain.employee.dto.response.EmployeeDistributionDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,7 +33,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
 
   @Query("""
       SELECT COUNT(e) FROM Employee e
-          WHERE e.hireDate BETWEEN :fromDate AND :toDate
+      WHERE e.hireDate BETWEEN :fromDate AND :toDate
       """)
   long countByHireDate(
       @Param("fromDate") LocalDate fromDate,
@@ -41,5 +43,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
   @Query("""
       SELECT COUNT(e) FROM Employee e
       """)
-  long countAll ();
+  long countAll();
+
+  List<Employee> findByStatus(EmployeeStatus status);
 }
