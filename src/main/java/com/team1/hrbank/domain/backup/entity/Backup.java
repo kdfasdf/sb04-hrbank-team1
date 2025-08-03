@@ -37,8 +37,8 @@ public class Backup extends BaseEntity {
   @Column(name = "endedAt", nullable = false)
   private LocalDateTime endedAt;
 
-  @OneToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "metadata_id", nullable = false)
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "metadata_id")
   private FileMetadata fileMetadata;
 
 }
