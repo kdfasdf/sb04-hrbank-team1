@@ -5,7 +5,10 @@ import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
+import com.team1.hrbank.domain.employee.dto.response.EmployeeDistributionDto;
+import com.team1.hrbank.domain.employee.dto.response.EmployeeTrendDto;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
+import com.team1.hrbank.domain.employee.entity.TimeUnitType;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -85,13 +87,41 @@ public class EmployeeController {
   @GetMapping("/count")
   public ResponseEntity<Long> countEmployees(
       @RequestParam(required = false) EmployeeStatus status,
-      @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate fromDate,
-      @RequestParam(required = false) @DateTimeFormat(iso= ISO.DATE) LocalDate toDate) {
+      @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate fromDate,
+      @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate toDate) {
 
     long employeesCount = employeeService.countEmployees(status, fromDate, toDate);
 
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(employeesCount);
+  }
+
+  @GetMapping("/status/trend")
+  public ResponseEntity<List<EmployeeTrendDto>> statusTrendEmployees(
+      @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate from,
+      @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate to,
+      @RequestParam(required = false, defaultValue = "month") String unit) {
+
+    TimeUnitType timeUnitType = TimeUnitType.fromString(unit);
+    List<EmployeeTrendDto> trend = employeeService.getEmployeeTrend(from, to, timeUnitType);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(trend);
+  }
+
+  @GetMapping("/status/distribution")
+  public ResponseEntity<List<EmployeeDistributionDto>> statusDistributionEmployees(
+      @RequestParam(required = false, defaultValue = "department") String groupBy,
+      @RequestParam(required = false, defaultValue = "ACTIVE") EmployeeStatus status
+  ) {
+
+    List<EmployeeDistributionDto> distribution = employeeService.getEmployeeDistribution(groupBy,
+        status);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(distribution);
   }
 }

@@ -1,14 +1,19 @@
 package com.team1.hrbank.domain.employee.service;
 
 import com.team1.hrbank.domain.changelog.service.ChangeLogService;
+
 import com.team1.hrbank.domain.department.entity.Department;
 import com.team1.hrbank.domain.department.repository.DepartmentRepository;
+
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeUpdateRequestDto;
 import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeDto;
+import com.team1.hrbank.domain.employee.dto.response.EmployeeDistributionDto;
+import com.team1.hrbank.domain.employee.dto.response.EmployeeTrendDto;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
+import com.team1.hrbank.domain.employee.entity.TimeUnitType;
 import com.team1.hrbank.domain.employee.mapper.EmployeeMapper;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
@@ -16,8 +21,12 @@ import com.team1.hrbank.domain.file.service.FileMetadataService;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -201,6 +210,68 @@ public class EmployeeService {
     return employeeRepository.countAll();
   }
 
+  public List<EmployeeTrendDto> getEmployeeTrend(LocalDate from, LocalDate to, TimeUnitType unit) {
+    if (to == null) {
+      to = LocalDate.now();
+    }
+
+    if (from == null) {
+      from = getDefaultFrom(to, unit, 12);
+    }
+
+    List<EmployeeTrendDto> result = new ArrayList<>();
+    List<LocalDate> periods = calculatePeriods(from, to, unit);
+
+    Long prevCount = null;
+
+    for (int i = 0; i < periods.size() - 1; i++) {
+      LocalDate start = periods.get(i);
+      LocalDate end = periods.get(i + 1).minusDays(1);
+
+      long count = employeeRepository.countByHireDate(start, end);
+      long change = prevCount == null ? 0 : count - prevCount;
+      double changeRate =
+          prevCount == null || prevCount == 0 ? 0.0 : change / (double) prevCount * 100.0;
+
+      result.add(new EmployeeTrendDto(start, count, change, Math.round(changeRate * 10.0) / 10.0));
+      prevCount = count;
+    }
+
+    return result;
+  }
+
+  public List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy,
+      EmployeeStatus status) {
+    if (groupBy == null || groupBy.isBlank()) {
+      groupBy = "department";
+    }
+
+    if (status == null) {
+      status = EmployeeStatus.ACTIVE;
+    }
+
+    List<Employee> employees = employeeRepository.findByStatus(status);
+
+    String finalGroupBy = groupBy;
+    Map<String, Long> groupedCount = employees.stream()
+        .collect(Collectors.groupingBy(
+            e -> finalGroupBy.equalsIgnoreCase("position") ? e.getPosition()
+                : e.getDepartment().getName(),
+            Collectors.counting()
+        ));
+
+    long totalCount = groupedCount.values().stream().mapToLong(Long::longValue).sum();
+
+    return groupedCount.entrySet().stream()
+        .map(e -> new EmployeeDistributionDto(
+            e.getKey(),
+            e.getValue(),
+            (double) e.getValue() / totalCount * 100
+        ))
+        .sorted(Comparator.comparingLong(EmployeeDistributionDto::count).reversed())
+        .toList();
+  }
+
   // 공통 메서드
   private Department getValidateDepartment(Long departmentId) {
     return departmentRepository.findById(departmentId)
@@ -216,6 +287,50 @@ public class EmployeeService {
   private Employee getValidateEmployee(long employeeId) {
     return employeeRepository.findById(employeeId)
         .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+  }
+
+  // 대시보드 공통 메서드
+  private LocalDate getDefaultFrom(LocalDate base, TimeUnitType unit, int amount) {
+    return switch (unit) {
+      case DAY -> base.minusDays(amount);
+      case WEEK -> base.minusWeeks(amount);
+      case MONTH -> base.minusMonths(amount);
+      case QUARTER -> base.minusMonths(amount * 3);
+      case YEAR -> base.minusYears(amount);
+    };
+  }
+
+  private List<LocalDate> calculatePeriods(LocalDate from, LocalDate to, TimeUnitType unit) {
+    List<LocalDate> points = new ArrayList<>();
+    LocalDate cursor = truncateToUnit(from, unit);
+    LocalDate limit = to.plusDays(1); // 포함되도록
+
+    while (cursor.isBefore(limit)) {
+      points.add(cursor);
+      cursor = incrementByUnit(cursor, unit);
+    }
+
+    return points;
+  }
+
+  private LocalDate truncateToUnit(LocalDate date, TimeUnitType unit) {
+    return switch (unit) {
+      case DAY -> date;
+      case WEEK -> date.with(ChronoField.DAY_OF_WEEK, 1); // 월요일
+      case MONTH -> date.withDayOfMonth(1);
+      case QUARTER -> date.withMonth(((date.getMonthValue() - 1) / 3) * 3 + 1).withDayOfMonth(1);
+      case YEAR -> date.withDayOfYear(1);
+    };
+  }
+
+  private LocalDate incrementByUnit(LocalDate date, TimeUnitType unit) {
+    return switch (unit) {
+      case DAY -> date.plusDays(1);
+      case WEEK -> date.plusWeeks(1);
+      case MONTH -> date.plusMonths(1);
+      case QUARTER -> date.plusMonths(3);
+      case YEAR -> date.plusYears(1);
+    };
   }
 
 }
