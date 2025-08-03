@@ -1,6 +1,5 @@
 package com.team1.hrbank.domain.file.service;
 
-import com.team1.hrbank.domain.backup.entity.Backup;
 import com.team1.hrbank.domain.backup.repository.BackupRepository;
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
@@ -95,14 +94,4 @@ public class FileMetadataService {
         .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 메타데이터가 존재하지 않습니다: " + id));
   }
 
-  @Transactional
-  public void cancelGenerateBackupFile(Long backupId) {
-    Backup backup = backupRepository.findById(backupId)
-        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 벡업 데이터가 존재하지 않습니다: " + backupId));
-
-    FileMetadata metadata = backup.getFileMetadata();
-
-    fileStorageManager.deleteFile(metadata.getFilePath()); // 물리적 파일 삭제
-    fileMetadataRepository.delete(metadata); // DB 삭제
-  }
 }

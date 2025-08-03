@@ -6,6 +6,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.core.io.FileSystemResource;
@@ -60,7 +62,10 @@ public class FileStorageManager {
     String extension = "csv";
     validateAllowedExtension(ALLOWED_BACKUP_EXTENSIONS, extension);
 
-    String savedName = "backup_" + backupId + "_" + UUID.randomUUID() + "." + extension;
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+
+    String savedName = String.format("backup_%s_%s_%s.%s",String.valueOf(backupId), timestamp, uniqueId, extension);
 
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, BACKUP_PATH);
@@ -71,10 +76,14 @@ public class FileStorageManager {
     return new StoredFileInfo(destFile, extension);
   }
 
-  public StoredFileInfo generateErrorLogFile(Long backupId, String errorLogContent) {
+  public StoredFileInfo generateErrorLogFile(Long backupId,String errorLogContent) {
     String extension = "log";
 
-    String savedName = "error_" + backupId + "_" + UUID.randomUUID() + ".log";
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+
+    String savedName = String.format("backup_error%s_%s_%s.%s",String.valueOf(backupId), timestamp, uniqueId, extension);
+
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, ERROR_LOG_PATH);
     ensureDirectoryExists(backupDir);
@@ -127,7 +136,9 @@ public class FileStorageManager {
 
   private File writeCsvFile(File dir, String savedName, List<Employee> employees) {
     File destFile = new File(dir, savedName);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(destFile))) {
+    File tempFile = new File(dir, "temp_" + System.currentTimeMillis() +"_");
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
       for(Employee employee : employees) {
         writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
             employee.getId(),
@@ -139,6 +150,14 @@ public class FileStorageManager {
             employee.getStatus().name()));
         writer.newLine();
       }
+
+      writer.flush();
+
+      // 성공 시에만 최종 파일명으로 변경
+      if (!tempFile.renameTo(destFile)) {
+        throw new IOException("파일 이름 변경 실패");
+      }
+
       return destFile;
     } catch (IOException e) {
       throw new RuntimeException("CSV 파일 저장 실패", e);
