@@ -26,7 +26,7 @@ public class DepartmentCustomRepositoryImpl implements DepartmentCustomRepositor
     String baseQuery = """
         SELECT
             d.id, d.name, d.description, d.established_date,
-            (SELECT COUNT(*) FROM employee e WHERE e.department_id = d.id) AS employee_count
+            (SELECT COUNT(*) FROM employees e WHERE e.department_id = d.id) AS employee_count
         FROM departments d
         WHERE
             (:keyword IS NULL OR LOWER(d.name) LIKE LOWER(:keywordPattern) OR LOWER(d.description) LIKE LOWER(:keywordPattern))
