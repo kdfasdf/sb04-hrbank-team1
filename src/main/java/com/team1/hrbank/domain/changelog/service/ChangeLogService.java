@@ -1,7 +1,6 @@
 package com.team1.hrbank.domain.changelog.service;
 
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
-import com.team1.hrbank.domain.changelog.dto.response.ChangeLogCountResponse;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
