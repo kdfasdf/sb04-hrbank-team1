@@ -20,6 +20,8 @@ import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
+import com.team1.hrbank.global.error.EmployeeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
@@ -280,13 +282,13 @@ public class EmployeeService {
 
   private void validateDuplicateEmail(String email) {
     if (employeeRepository.findByEmail(email).isPresent()) {
-      throw new IllegalArgumentException("Email already in use");
+      throw new EmployeeException(EmployeeErrorCode.EMPLOYEE_EMAIL_DUPLICATE);
     }
   }
 
   private Employee getValidateEmployee(long employeeId) {
     return employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
   }
 
   // 대시보드 공통 메서드
