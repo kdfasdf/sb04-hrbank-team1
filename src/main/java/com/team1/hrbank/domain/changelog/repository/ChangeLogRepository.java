@@ -153,6 +153,5 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("to") LocalDateTime to
     );
 
-    @Query("SELECT c FROM ChangeLog c ORDER BY c.updatedAt DESC")
-    Optional<ChangeLog> findFirstByUpdatedAtDesc();
+    Optional<ChangeLog> findFirstByOrderByUpdatedAtDesc();
 }
