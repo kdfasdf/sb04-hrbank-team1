@@ -10,44 +10,117 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
+        // 생성일 오름차순
+        @Query(value = """
+                SELECT * FROM change_logs
+                WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
+                  AND (:memo IS NULL OR LOWER(memo) LIKE '%' || LOWER(:memo) || '%')
+                  AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE '%' || LOWER(:ipAddress) || '%')
+                  AND (:type IS NULL OR type = :type)
+                  AND (
+                      (:from IS NULL AND :to IS NULL)
+                      OR (:from IS NULL AND created_at <= :to)
+                      OR (:to IS NULL AND created_at >= :from)
+                      OR (created_at BETWEEN :from AND :to)
+                  )
+                  AND (:lastId IS NULL OR id > :lastId)
+                ORDER BY created_at ASC
+                LIMIT :limit
+                """, nativeQuery = true)
+        List<ChangeLog> findAllOrderByCreatedAtAsc(
+                @Param("employeeNumber") String employeeNumber,
+                @Param("memo") String memo,
+                @Param("ipAddress") String ipAddress,
+                @Param("type") String type,
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to,
+                @Param("lastId") Long lastId,
+                @Param("limit") int limit
+        );
 
-    @Query(value = """
-            SELECT *
-            FROM change_logs
-            WHERE
-                (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-                AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-                AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-                AND (:type IS NULL OR type = :type)
-                AND (
-                    (:from IS NULL AND :to IS NULL)
-                    OR (:from IS NULL AND created_at <= :to)
-                    OR (:to IS NULL AND created_at >= :from)
-                    OR (created_at BETWEEN :from AND :to)
-                )
-                AND (:lastId IS NULL OR
-                    (:direction = 'ASC' AND id > :lastId)
-                    OR (:direction = 'DESC' AND id < :lastId)
-                )
-            ORDER BY
-                CASE WHEN :sortKey = 'CREATED_AT_ASC' THEN created_at END,
-                CASE WHEN :sortKey = 'CREATED_AT_DESC' THEN created_at END DESC,
-                CASE WHEN :sortKey = 'IP_ADDRESS_ASC' THEN ip_address END,
-                CASE WHEN :sortKey = 'IP_ADDRESS_DESC' THEN ip_address END DESC
-            LIMIT :limit
-            """, nativeQuery = true)
-    List<ChangeLog> findAllByCondition(
-            @Param("employeeNumber") String employeeNumber,
-            @Param("memo") String memo,
-            @Param("ipAddress") String ipAddress,
-            @Param("type") String type,
-            @Param("from") LocalDateTime from,
-            @Param("to") LocalDateTime to,
-            @Param("lastId") Long lastId,
-            @Param("direction") String direction,
-            @Param("sortKey") String sortKey,
-            @Param("limit") int limit
-    );
+        // 생성일 내림차순
+        @Query(value = """
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
+          AND (:memo IS NULL OR LOWER(memo) LIKE '%' || LOWER(:memo) || '%')
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE '%' || LOWER(:ipAddress) || '%')
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id < :lastId)
+        ORDER BY created_at DESC
+        LIMIT :limit
+        """, nativeQuery = true)
+        List<ChangeLog> findAllOrderByCreatedAtDesc(
+                @Param("employeeNumber") String employeeNumber,
+                @Param("memo") String memo,
+                @Param("ipAddress") String ipAddress,
+                @Param("type") String type,
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to,
+                @Param("lastId") Long lastId,
+                @Param("limit") int limit
+        );
+
+        // ip주소 오름차순
+        @Query(value = """
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
+          AND (:memo IS NULL OR LOWER(memo) LIKE '%' || LOWER(:memo) || '%')
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE '%' || LOWER(:ipAddress) || '%')
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id > :lastId)
+        ORDER BY ip_address ASC
+        LIMIT :limit
+        """, nativeQuery = true)
+        List<ChangeLog> findAllOrderByIpAddressAsc(
+                @Param("employeeNumber") String employeeNumber,
+                @Param("memo") String memo,
+                @Param("ipAddress") String ipAddress,
+                @Param("type") String type,
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to,
+                @Param("lastId") Long lastId,
+                @Param("limit") int limit
+        );
+
+        // ip주소 내림차순
+        @Query(value = """
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
+          AND (:memo IS NULL OR LOWER(memo) LIKE '%' || LOWER(:memo) || '%')
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE '%' || LOWER(:ipAddress) || '%')
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id < :lastId)
+        ORDER BY ip_address DESC
+        LIMIT :limit
+        """, nativeQuery = true)
+        List<ChangeLog> findAllOrderByIpAddressDesc(
+                @Param("employeeNumber") String employeeNumber,
+                @Param("memo") String memo,
+                @Param("ipAddress") String ipAddress,
+                @Param("type") String type,
+                @Param("from") LocalDateTime from,
+                @Param("to") LocalDateTime to,
+                @Param("lastId") Long lastId,
+                @Param("limit") int limit
+        );
 
     @Query(value = """
             SELECT COUNT(*) 
@@ -56,7 +129,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
                 (:employeeNumber IS NULL OR employee_number = :employeeNumber)
                 AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
                 AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-                AND (:type IS NULL OR type = :type)
+                AND (:type IS NULL OR CAST(type AS VARCHAR) = :type)
                 AND (
                     (:from IS NULL AND :to IS NULL)
                     OR (:from IS NULL AND created_at <= :to)
