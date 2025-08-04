@@ -12,12 +12,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.View;
 
 @Component
+@Slf4j
 public class FileStorageManager {
 
   private static final List<String> ALLOWED_PROFILE_EXTENSIONS = List.of("png", "jpg", "jpeg");
@@ -25,6 +28,11 @@ public class FileStorageManager {
   private static final String PROFILE_PATH = "uploads/profile";
   private static final String BACKUP_PATH = "uploads/backup";
   private static final String ERROR_LOG_PATH = "uploads/backup/error-log";
+  private final View error;
+
+  public FileStorageManager(View error) {
+    this.error = error;
+  }
 
   public StoredFileInfo uploadProfileImage(Long employeeId, MultipartFile file) {
     String originalFilename = file.getOriginalFilename();
@@ -106,11 +114,13 @@ public class FileStorageManager {
     try {
       File file = new File(filePath);
       if (!file.exists()) {
+        log.error("파일 다운로드 실패: 존재하지 않는 파일 - {}", filePath);
         throw new FileException(FileErrorCode.FILE_NOT_FOUND);
       }
 
       return new FileSystemResource(file);
     } catch (Exception e) {
+      log.error("파일 다운로드 중 예외 발생: {}", e.getMessage(), e);
       throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED);
     }
 
@@ -118,6 +128,7 @@ public class FileStorageManager {
 
   private void validateOriginalFileName(String fileName) {
     if (fileName == null || !fileName.contains(".")) {
+      log.error("유효하지 않은 파일명: {}", fileName);
       throw new FileException(FileErrorCode.INVALID_FILE_NAME);
     }
   }
@@ -128,6 +139,7 @@ public class FileStorageManager {
 
   private void validateAllowedExtension(List<String> allowedExtension, String extension) {
     if (!allowedExtension.contains(extension)) {
+      log.error("지원하지 않는 확장자입니다: 요청한 확장자 = {}, 허용 목록 = {}", extension, allowedExtension);
       throw new FileException(FileErrorCode.UNSUPPORTED_EXTENSION);
     }
   }
@@ -144,6 +156,7 @@ public class FileStorageManager {
       file.transferTo(destFile);
       return destFile;
     } catch (IOException e) {
+      log.error("파일 저장 실패: dir = {}, savedName = {}, file = {}", dir, savedName, file);
       throw new FileException(FileErrorCode.FILE_SAVE_FAILED);
     }
   }
@@ -169,11 +182,13 @@ public class FileStorageManager {
 
       // 성공 시에만 최종 파일명으로 변경
       if (!tempFile.renameTo(destFile)) {
+        log.error("파일 이름 변경 실패: tempFile = {}, destFile = {}", tempFile, destFile);
         throw new FileException(FileErrorCode.FILE_RENAME_FAILED);
       }
 
       return destFile;
     } catch (IOException e) {
+      log.error("CSV 파일 저장 중 IOException 발생: {}", e.getMessage(), e);
       throw new FileException(FileErrorCode.CSV_WRITE_FAILED);
     }
   }
@@ -184,6 +199,7 @@ public class FileStorageManager {
       writer.write(errorLogContent);
       return destFile;
     } catch (IOException e) {
+      log.error("에러 로그 저장 실패: file = {}, errorLogContent = {}", destFile, errorLogContent);
       throw new FileException(FileErrorCode.LOG_WRITE_FAILED);
     }
   }
