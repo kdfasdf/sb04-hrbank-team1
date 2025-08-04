@@ -32,13 +32,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Employee", description = "직원 관리 API")
+@Tag(name = "직원 관리", description = "직원 관리 API")
 @RequestMapping("/api/employees")
-public class EmployeeController {
+public class EmployeeController implements EmployeeApi {
 
   private final EmployeeService employeeService;
 
   @PostMapping
+  @Override
   public ResponseEntity<EmployeeDto> createEmployee(
       @RequestPart("employee") EmployeeCreateRequestDto employeeCreateRequestDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
@@ -51,6 +52,7 @@ public class EmployeeController {
   }
 
   @PatchMapping("/{id}")
+  @Override
   public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
       @RequestPart("employee") EmployeeUpdateRequestDto employeeUpdateRequestDto,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
@@ -63,12 +65,14 @@ public class EmployeeController {
   }
 
   @DeleteMapping("/{id}")
+  @Override
   public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, HttpServletRequest request) {
     String clientIp = request.getRemoteAddr();
     employeeService.deleteEmployee(id, clientIp);
     return ResponseEntity.noContent().build();
   }
 
+  @Override
   @GetMapping
   public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
       @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
@@ -77,6 +81,7 @@ public class EmployeeController {
     return ResponseEntity.ok(cursorPageResponseEmployeeDto);
   }
 
+  @Override
   @GetMapping("/{id}")
   public ResponseEntity<EmployeeDto> findEmployee(@PathVariable("id") Long id) {
     EmployeeDto employeeDto = employeeService.findEmployee(id);
@@ -84,6 +89,7 @@ public class EmployeeController {
   }
 
   // 대시보드
+  @Override
   @GetMapping("/count")
   public ResponseEntity<Long> countEmployees(
       @RequestParam(required = false) EmployeeStatus status,
@@ -97,6 +103,7 @@ public class EmployeeController {
         .body(employeesCount);
   }
 
+  @Override
   @GetMapping("/stats/trend")
   public ResponseEntity<List<EmployeeTrendDto>> statusTrendEmployees(
       @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate from,
@@ -111,6 +118,7 @@ public class EmployeeController {
         .body(trend);
   }
 
+  @Override
   @GetMapping("/stats/distribution")
   public ResponseEntity<List<EmployeeDistributionDto>> statusDistributionEmployees(
       @RequestParam(required = false, defaultValue = "department") String groupBy,
