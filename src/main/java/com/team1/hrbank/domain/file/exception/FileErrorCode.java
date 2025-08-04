@@ -14,15 +14,14 @@ public enum FileErrorCode implements ErrorCode {
   INVALID_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "올바르지 않은 파일명", "파일명에 확장자가 없거나 null"),
 
   UNSUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST.value(), "지원하지 않는 확장자",
-      "다음 확장자만 허용! 프로필: png, jpg, jpeg / 백업: csv, log"),
+      "다음 확장자만 허용 | 프로필: png, jpg, jpeg / 백업: csv, log"),
 
   DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "디렉토리 생성 실패",
       "파일 저장 폴더 생성 실패"),
 
   FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "파일 저장 실패", "파일 저장 중 오류 발생"),
 
-  FILE_RENAME_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "파일 이름 변경 실패",
-      "임시 파일 -> 대상 파일로 이름 변경 중 오류 발생"),
+  FILE_RENAME_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "파일 이름 변경 실패", "파일 이름 변경 실패"),
 
   CSV_WRITE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "CSV 파일 저장 실패", "백업 파일 생성 증 오류 발생"),
 
