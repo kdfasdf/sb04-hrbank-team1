@@ -4,6 +4,7 @@ import com.team1.hrbank.domain.backup.dto.response.BackupDto;
 import com.team1.hrbank.domain.backup.dto.response.CursorPageResponseBackupDto;
 import com.team1.hrbank.domain.backup.entity.Backup;
 import com.team1.hrbank.domain.backup.entity.BackupStatus;
+import com.team1.hrbank.domain.backup.exception.BackupException;
 import com.team1.hrbank.domain.backup.mapper.BackupMapper;
 import com.team1.hrbank.domain.backup.repository.BackupRepository;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
@@ -12,6 +13,7 @@ import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
+import com.team1.hrbank.global.constant.BakcupErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -57,13 +59,9 @@ public class BackupService {
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
-      FileMetadata fileMetadata = fileMetaDataService.generateErrorLogFile(backup.getId(),
-          e.getMessage());
-      //Todo 커스텀 예외 처리 후 GlobalExceptionHandler에서 에러 응답으로 반환
+      fileMetaDataService.generateErrorLogFile(backup.getId(), e.getMessage());
+      throw new BackupException(BakcupErrorCode.BACKUP_FAILED);
     }
-
-    backup.setEndedAt(LocalDateTime.now());
-    return backMapper.toDto(backup);
   }
 
   private boolean shouldSkipBackup() {
@@ -185,7 +183,7 @@ public class BackupService {
   @Transactional(readOnly = true)
   public BackupDto findLatest(String status) {
     Backup backup = backupRepository.findFirstByStatusOrderByCreatedAtDesc(BackupStatus.valueOf(status))
-        .orElseThrow(() -> new IllegalStateException("최신 백업 상태 없음"));
+        .orElseThrow(() -> new BackupException(BakcupErrorCode.RECENT_BACKUP_NOT_EXIST));
     return backMapper.toDto(backup);
   }
 }
