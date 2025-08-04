@@ -3,7 +3,7 @@ spring:
     activate:
       on-profiles: dev
   datasource:
-    url: jdbc:h2:tcp://localhost/~/hrbank
+    url: jdbc:h2:~/hrbank
     username: hrbank
     password: hrbank1234
   jpa:
@@ -13,6 +13,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  h2:
+    console:
+      enabled: true       # H2 콘솔 활성화
+      path: /h2-console   # 접속 경로 지정 (기본: /h2-console)
   logging:
     level:
       org.hibernate.type: INFO
