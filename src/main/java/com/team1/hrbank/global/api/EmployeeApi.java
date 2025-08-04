@@ -1,4 +1,4 @@
-package com.team1.hrbank.domain.employee.controller;
+package com.team1.hrbank.global.api;
 
 import com.team1.hrbank.domain.employee.dto.EmployeeDto;
 import com.team1.hrbank.domain.employee.dto.request.CursorPageRequestDto;
@@ -8,7 +8,6 @@ import com.team1.hrbank.domain.employee.dto.response.CursorPageResponseEmployeeD
 import com.team1.hrbank.domain.employee.dto.response.EmployeeDistributionDto;
 import com.team1.hrbank.domain.employee.dto.response.EmployeeTrendDto;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
-import com.team1.hrbank.domain.employee.entity.TimeUnitType;
 import com.team1.hrbank.global.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

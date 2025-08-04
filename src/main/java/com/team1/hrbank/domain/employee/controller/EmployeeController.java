@@ -10,6 +10,7 @@ import com.team1.hrbank.domain.employee.dto.response.EmployeeTrendDto;
 import com.team1.hrbank.domain.employee.entity.EmployeeStatus;
 import com.team1.hrbank.domain.employee.entity.TimeUnitType;
 import com.team1.hrbank.domain.employee.service.EmployeeService;
+import com.team1.hrbank.global.api.EmployeeApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
