@@ -11,8 +11,6 @@ import com.team1.hrbank.global.constant.EmployeeErrorCode;
 import com.team1.hrbank.domain.file.exception.FileException;
 import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
-import com.team1.hrbank.global.constant.EmployeeErrorCode;
-import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -32,7 +30,7 @@ public class FileMetadataService {
   @Transactional
   public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
     Employee employee = employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND);
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
 
     // 기존 이미지 삭제
     FileMetadata oldMeta = employee.getFileMetadata();
