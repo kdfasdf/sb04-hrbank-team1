@@ -7,6 +7,8 @@ import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
+import com.team1.hrbank.global.error.EmployeeException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class FileMetadataService {
   @Transactional
   public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
     Employee employee = employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new NoSuchElementException("그런 직원 없음"));
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
 
     // 기존 이미지 삭제
     FileMetadata oldMeta = employee.getFileMetadata();
