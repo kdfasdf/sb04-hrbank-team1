@@ -74,9 +74,15 @@ public class EmployeeService {
       EmployeeUpdateRequestDto employeeUpdateRequestDto,
       MultipartFile profile,
       String clientIp) {
-    validateDuplicateEmail(employeeUpdateRequestDto.email());
+
     Department newDepartment = getValidateDepartment(employeeUpdateRequestDto.departmentId());
     Employee findEmployee = getValidateEmployee(employeeId);
+
+    if (!employeeUpdateRequestDto.email().equals(findEmployee.getEmail())) {
+      validateDuplicateEmail(
+          employeeUpdateRequestDto.email()); // 수정 전과 후가 같은 이메일이 아닐 때, 그리고 다른 직원읭 이메일과 중복 될 때 예외 발생
+    }
+
     FileMetadata fileMetadata = findEmployee.getFileMetadata();
     Department department = findEmployee.getDepartment();
 
@@ -84,10 +90,13 @@ public class EmployeeService {
         department.getDescription(),
         department.getEstablishedDate(), department.getEmployees());
 
-    FileMetadata oldFileMetadata = new FileMetadata(fileMetadata.getOriginalName(),
-        fileMetadata.getSavedName(), fileMetadata.getFilePath(), fileMetadata.getFileType(),
-        fileMetadata.getFileSize(), fileMetadata.getFilePath());
+    FileMetadata oldFileMetadata = null;
 
+    if (fileMetadata != null) {
+      oldFileMetadata = new FileMetadata(fileMetadata.getOriginalName(),
+          fileMetadata.getSavedName(), fileMetadata.getExtension(), fileMetadata.getFileType(),
+          fileMetadata.getFileSize(), fileMetadata.getFilePath());
+    }
     Employee oldEmployee = new Employee(
         findEmployee.getEmployeeNumber(), findEmployee.getName(), findEmployee.getEmail(),
         findEmployee.getPosition(), findEmployee.getHireDate(), findEmployee.getStatus(),
@@ -99,8 +108,13 @@ public class EmployeeService {
     findEmployee.setHireDate(employeeUpdateRequestDto.hireDate());
     findEmployee.setStatus(EmployeeStatus.valueOf(employeeUpdateRequestDto.status()));
 
-    FileMetadata newFileMetadata = fileMetadataService.uploadProfileImage(findEmployee.getId(),
-        profile);
+    FileMetadata newFileMetadata = null;
+    if (profile != null) {
+      newFileMetadata = fileMetadataService.uploadProfileImage(findEmployee.getId(),
+          profile);
+    } else if (oldFileMetadata != null) {
+      newFileMetadata = oldFileMetadata;
+    }
 
     findEmployee.setDepartment(newDepartment);
     findEmployee.setFileMetadata(newFileMetadata);
