@@ -35,8 +35,7 @@ public interface SwaggerChangeLogController {
                   "message": "잘못된 요청입니다",
                   "details": "유효하지 않은 정렬 키입니다."
                 }
-            """))),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+            """)))
     })
     ResponseEntity<ChangeLogSearchResponse> getChangeLogs(
             @Parameter(description = "검색 조건이 담긴 요청 객체") @ModelAttribute ChangeLogSearchRequest changeLogSearchRequest
@@ -54,8 +53,7 @@ public interface SwaggerChangeLogController {
                   "message": "요청하신 이력이 존재하지 않습니다",
                   "details": "이력을 찾을 수 없습니다."
                 }
-            """))),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+            """)))
     })
     ResponseEntity<List<ChangeLogDiffResponse>> getDiffs(
             @Parameter(description = "체인지로그 ID") @PathVariable Long changeLogId
@@ -73,8 +71,7 @@ public interface SwaggerChangeLogController {
                   "message": "잘못된 요청입니다",
                   "details": "유효하지 않은 날짜 범위입니다."
                 }
-            """))),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
+            """)))
     })
     ResponseEntity<Long> getChangeLogsCount(
             @Parameter(description = "시작 일시", example = "2025-08-01T00:00:00")
