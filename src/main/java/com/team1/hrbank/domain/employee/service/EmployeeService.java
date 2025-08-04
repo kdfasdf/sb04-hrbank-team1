@@ -20,7 +20,7 @@ import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 
-import com.team1.hrbank.domain.employee.constant.EmployeeErrorCode;
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
 import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;

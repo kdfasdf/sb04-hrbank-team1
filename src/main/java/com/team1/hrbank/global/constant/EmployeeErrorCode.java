@@ -1,6 +1,5 @@
-package com.team1.hrbank.domain.employee.constant;
+package com.team1.hrbank.global.constant;
 
-import com.team1.hrbank.global.constant.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

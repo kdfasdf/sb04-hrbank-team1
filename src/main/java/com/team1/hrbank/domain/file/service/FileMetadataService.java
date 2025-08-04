@@ -7,7 +7,7 @@ import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
-import com.team1.hrbank.domain.employee.constant.EmployeeErrorCode;
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
 import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
