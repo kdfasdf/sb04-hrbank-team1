@@ -71,7 +71,7 @@ public class BackupService {
     }
     LocalDateTime recentChangeLogTime = recentChangeLog.get().getUpdatedAt();
 
-    Optional<Backup> recentBackup = backupRepository.findFirstOrderByEndedAtDesc();
+    Optional<Backup> recentBackup = backupRepository.findFirstOrderByCreatedAtDesc();
     if (recentBackup.isEmpty()) { // 첫 백업 수행해야함
       return false;
     }

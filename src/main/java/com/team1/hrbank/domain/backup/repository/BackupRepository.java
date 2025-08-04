@@ -11,9 +11,9 @@ import org.springframework.data.repository.query.Param;
 public interface BackupRepository extends JpaRepository<Backup, Long>,
     JpaSpecificationExecutor<Backup> {
 
-  @Query("select b from Backup b order by b.createdAt desc")
-  Optional<Backup> findFirstOrderByEndedAtDesc();
+  @Query("select b from Backup b order by b.createdAt desc limit 1")
+  Optional<Backup> findFirstOrderByCreatedAtDesc();
 
-  @Query("select b from Backup b where b.status = :status order by b.createdAt desc")
+  @Query("select b from Backup b where b.status = :status order by b.createdAt desc limit 1")
   Optional<Backup> findFirstByStatusOrderByCreatedAtDesc(@Param("status") BackupStatus status);
 }
