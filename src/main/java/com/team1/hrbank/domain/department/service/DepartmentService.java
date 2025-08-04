@@ -2,7 +2,7 @@ package com.team1.hrbank.domain.department.service;
 
 import com.team1.hrbank.domain.department.dto.request.DepartmentSearchRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
-import com.team1.hrbank.domain.department.exception.DepartmentErrorCode;
+import com.team1.hrbank.global.constant.DepartmentErrorCode;
 import com.team1.hrbank.domain.department.exception.DepartmentException;
 import com.team1.hrbank.domain.department.mapper.DepartmentMapper;
 import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
