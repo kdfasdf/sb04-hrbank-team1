@@ -38,7 +38,7 @@ public class DepartmentController implements SwaggerDepartmentController {
 
   @PatchMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<DepartmentDto> update(
-      @PathVariable("id") @Parameter(description = "부서 ID") Long id,
+      @PathVariable("id") Long id,
       @RequestBody DepartmentUpdateRequestDto departmentUpdateRequestDto
   ) {
     DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);
