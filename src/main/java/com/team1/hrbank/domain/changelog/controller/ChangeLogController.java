@@ -5,6 +5,7 @@ import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.service.ChangeLogDiffService;
 import com.team1.hrbank.domain.changelog.service.ChangeLogService;
+import com.team1.hrbank.global.api.SwaggerChangeLogController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/change-logs")
-public class ChangeLogController {
+public class ChangeLogController implements SwaggerChangeLogController {
 
     private final ChangeLogService changeLogService;
     private final ChangeLogDiffService changeLogDiffService;

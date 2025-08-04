@@ -32,7 +32,7 @@ public class FileMetadataService {
   @Transactional
   public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
     Employee employee = employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND);
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
 
     // 기존 이미지 삭제
     FileMetadata oldMeta = employee.getFileMetadata();
