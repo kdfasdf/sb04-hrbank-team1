@@ -82,6 +82,10 @@ public class ChangeLogService {
 
     // 정렬 기능은 리포지토리로 이관함
     private String getDirection(ChangeLogSearchRequest.SortKey sortKey) {
+        if (sortKey == null) {
+            throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_KEY);
+        }
+
         return switch (sortKey) {
             case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
             case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
