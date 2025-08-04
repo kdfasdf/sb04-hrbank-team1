@@ -34,7 +34,7 @@ public class Backup extends BaseEntity {
   @Column(name = "status", nullable = false, length = 10)
   private BackupStatus status;    //진행중,완료,건너뜀,실패
 
-  @Column(name = "endedAt", nullable = false)
+  @Column(name = "endedAt")
   private LocalDateTime endedAt;
 
   @OneToOne(fetch = FetchType.LAZY)
