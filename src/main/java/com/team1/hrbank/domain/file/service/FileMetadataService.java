@@ -6,6 +6,8 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
+import com.team1.hrbank.domain.file.exception.FileErrorCode;
+import com.team1.hrbank.domain.file.exception.FileException;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -83,7 +85,7 @@ public class FileMetadataService {
   @Transactional(readOnly = true)
   public Resource downloadFile(Long id) {
     FileMetadata metadata = fileMetadataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 메타데이터가 존재하지 않습니다: " + id));
+        .orElseThrow(() -> new FileException(FileErrorCode.FILE_NOT_FOUND));
 
     return fileStorageManager.downloadFile(metadata.getFilePath());
   }
@@ -91,7 +93,6 @@ public class FileMetadataService {
   @Transactional(readOnly = true)
   public FileMetadata getFileMetadata(Long id) {
     return fileMetadataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 메타데이터가 존재하지 않습니다: " + id));
+        .orElseThrow(() -> new FileException(FileErrorCode.FILE_NOT_FOUND));
   }
-
 }

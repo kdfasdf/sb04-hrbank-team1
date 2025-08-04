@@ -2,6 +2,8 @@ package com.team1.hrbank.domain.file.service;
 
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
+import com.team1.hrbank.domain.file.exception.FileErrorCode;
+import com.team1.hrbank.domain.file.exception.FileException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,9 +38,14 @@ public class FileStorageManager {
     ensureDirectoryExists(uploadDir);
 
     String savedName = "profile_" + employeeId + "_" + UUID.randomUUID() + "." + extension;
-    File savedFile = saveFileToDirectory(file, uploadDir, savedName);
+    try {
+      File savedFile = saveFileToDirectory(file, uploadDir, savedName);
 
-    return new StoredFileInfo(savedFile, extension);
+      return new StoredFileInfo(savedFile, extension);
+    } catch (Exception e) {
+      throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED);
+    }
+
   }
 
   public void deleteFile(String filePath) {
@@ -51,7 +58,7 @@ public class FileStorageManager {
     if (file.exists()) {
       boolean deleted = file.delete();
       if (!deleted) {
-        throw new RuntimeException("파일 삭제 실패: " + filePath);
+        throw new FileException(FileErrorCode.FILE_DELETE_FAILED);
       }
     }
   }
@@ -65,24 +72,26 @@ public class FileStorageManager {
     String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     String uniqueId = UUID.randomUUID().toString().substring(0, 8);
 
-    String savedName = String.format("backup_%s_%s_%s.%s",String.valueOf(backupId), timestamp, uniqueId, extension);
+    String savedName = String.format("backup_%s_%s_%s.%s", String.valueOf(backupId), timestamp,
+        uniqueId, extension);
 
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, BACKUP_PATH);
     ensureDirectoryExists(backupDir);
 
-    File destFile = writeCsvFile(backupDir, savedName,employees);
+    File destFile = writeCsvFile(backupDir, savedName, employees);
 
     return new StoredFileInfo(destFile, extension);
   }
 
-  public StoredFileInfo generateErrorLogFile(Long backupId,String errorLogContent) {
+  public StoredFileInfo generateErrorLogFile(Long backupId, String errorLogContent) {
     String extension = "log";
 
     String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
     String uniqueId = UUID.randomUUID().toString().substring(0, 8);
 
-    String savedName = String.format("backup_error%s_%s_%s.%s",String.valueOf(backupId), timestamp, uniqueId, extension);
+    String savedName = String.format("backup_error%s_%s_%s.%s", String.valueOf(backupId), timestamp,
+        uniqueId, extension);
 
     String rootPath = System.getProperty("user.dir");
     File backupDir = new File(rootPath, ERROR_LOG_PATH);
@@ -94,17 +103,22 @@ public class FileStorageManager {
   }
 
   public Resource downloadFile(String filePath) {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      throw new RuntimeException("파일 없음: " + filePath);
+    try {
+      File file = new File(filePath);
+      if (!file.exists()) {
+        throw new FileException(FileErrorCode.FILE_NOT_FOUND);
+      }
+
+      return new FileSystemResource(file);
+    } catch (Exception e) {
+      throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED);
     }
 
-    return new FileSystemResource(file);
   }
 
   private void validateOriginalFileName(String fileName) {
     if (fileName == null || !fileName.contains(".")) {
-      throw new IllegalArgumentException("올바르지 않은 파일명");
+      throw new FileException(FileErrorCode.INVALID_FILE_NAME);
     }
   }
 
@@ -114,13 +128,13 @@ public class FileStorageManager {
 
   private void validateAllowedExtension(List<String> allowedExtension, String extension) {
     if (!allowedExtension.contains(extension)) {
-      throw new IllegalArgumentException("허용되지 않는 확장자, 현재 확장자: " + extension);
+      throw new FileException(FileErrorCode.UNSUPPORTED_EXTENSION);
     }
   }
 
   private void ensureDirectoryExists(File dir) {
     if (!dir.exists() && !dir.mkdirs()) {
-      throw new RuntimeException("디렉토리 생성 실패");
+      throw new FileException(FileErrorCode.DIRECTORY_CREATION_FAILED);
     }
   }
 
@@ -130,16 +144,16 @@ public class FileStorageManager {
       file.transferTo(destFile);
       return destFile;
     } catch (IOException e) {
-      throw new RuntimeException("파일 저장 중 오류 발생", e);
+      throw new FileException(FileErrorCode.FILE_SAVE_FAILED);
     }
   }
 
   private File writeCsvFile(File dir, String savedName, List<Employee> employees) {
     File destFile = new File(dir, savedName);
-    File tempFile = new File(dir, "temp_" + System.currentTimeMillis() +"_");
+    File tempFile = new File(dir, "temp_" + System.currentTimeMillis() + "_");
 
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-      for(Employee employee : employees) {
+      for (Employee employee : employees) {
         writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
             employee.getId(),
             employee.getEmployeeNumber(),
@@ -155,12 +169,12 @@ public class FileStorageManager {
 
       // 성공 시에만 최종 파일명으로 변경
       if (!tempFile.renameTo(destFile)) {
-        throw new IOException("파일 이름 변경 실패");
+        throw new FileException(FileErrorCode.FILE_RENAME_FAILED);
       }
 
       return destFile;
     } catch (IOException e) {
-      throw new RuntimeException("CSV 파일 저장 실패", e);
+      throw new FileException(FileErrorCode.CSV_WRITE_FAILED);
     }
   }
 
@@ -170,7 +184,7 @@ public class FileStorageManager {
       writer.write(errorLogContent);
       return destFile;
     } catch (IOException e) {
-      throw new RuntimeException("log 파일 저장 실패", e);
+      throw new FileException(FileErrorCode.LOG_WRITE_FAILED);
     }
   }
 }
