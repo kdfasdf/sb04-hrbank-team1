@@ -174,6 +174,10 @@ public class BackupService {
   }
 
   private Pageable createPageable(Integer size, String sortField, String sortDirection) {
+    if ("startedAt".equals(sortField)) {
+      sortField = "createdAt";
+    }
+
     Sort.Direction direction =
         "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
     Sort sort = Sort.by(direction, sortField);
