@@ -29,6 +29,7 @@ public class FileMetadataService {
   @Transactional
   public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
     Employee employee = employeeRepository.findById(employeeId)
+        // TODO: EmployeeException은 아직 merge 전이라 추후 변경 예정
         .orElseThrow(() -> new NoSuchElementException("그런 직원 없음"));
 
     // 기존 이미지 삭제
