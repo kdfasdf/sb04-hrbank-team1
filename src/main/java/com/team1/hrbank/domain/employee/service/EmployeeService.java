@@ -125,6 +125,11 @@ public class EmployeeService {
         cursorPageRequestDto);
     Long totalElements = (long) employees.size();
 
+    if (totalElements == 0) {
+      return new CursorPageResponseEmployeeDto(List.of(), null, null, 0, totalElements,
+          false);
+    }
+
     int startIndex = 0;  // 다음 커서를 찾으면
     Long idAfter = cursorPageRequestDto.idAfter(); // 이게 Long 타입이라고 가정
 
