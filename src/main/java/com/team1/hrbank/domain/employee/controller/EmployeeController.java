@@ -76,11 +76,29 @@ public class EmployeeController implements EmployeeApi {
   @Override
   @GetMapping
   public ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
-      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto) {
-    CursorPageResponseEmployeeDto cursorPageResponseEmployeeDto = employeeService.findEmployees(
-        cursorPageRequestDto);
-    return ResponseEntity.ok(cursorPageResponseEmployeeDto);
+      @RequestParam(required = false) String nameOrEmail,
+      @RequestParam(required = false) String employeeNumber,
+      @RequestParam(required = false) String departmentName,
+      @RequestParam(required = false) String position,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateFrom,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateTo,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) Long idAfter,
+      @RequestParam(required = false) String cursor,
+      @RequestParam(required = false, defaultValue = "10") Integer size,
+      @RequestParam(required = false, defaultValue = "name") String sortField,
+      @RequestParam(required = false, defaultValue = "asc") String sortDirection
+  ) {
+    CursorPageRequestDto requestDto = new CursorPageRequestDto(
+        nameOrEmail, employeeNumber, departmentName, position,
+        hireDateFrom, hireDateTo, status, idAfter, cursor,
+        size, sortField, sortDirection
+    );
+
+    CursorPageResponseEmployeeDto response = employeeService.findEmployees(requestDto);
+    return ResponseEntity.ok(response);
   }
+
 
   @Override
   @GetMapping("/{id}")

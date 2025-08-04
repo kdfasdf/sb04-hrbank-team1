@@ -85,21 +85,6 @@ public interface EmployeeApi {
   @Operation(
       summary = "직원 목록 조회",
       description = "직원 목록을 조회합니다.",
-      parameters = {
-          @Parameter(name = "nameOrEmail", in = ParameterIn.QUERY, description = "직원 이름 또는 이메일", required = false, schema = @Schema(type = "string")),
-          @Parameter(name = "employeeNumber", in = ParameterIn.QUERY, description = "사원 번호", required = false, schema = @Schema(type = "string")),
-          @Parameter(name = "departmentName", in = ParameterIn.QUERY, description = "부서 이름", required = false, schema = @Schema(type = "string")),
-          @Parameter(name = "position", in = ParameterIn.QUERY, description = "직함", required = false, schema = @Schema(type = "string")),
-          @Parameter(name = "hireDateFrom", in = ParameterIn.QUERY, description = "입사일 시작", required = false, schema = @Schema(type = "string", format = "date")),
-          @Parameter(name = "hireDateTo", in = ParameterIn.QUERY, description = "입사일 종료", required = false, schema = @Schema(type = "string", format = "date")),
-          @Parameter(name = "status", in = ParameterIn.QUERY, description = "상태 (재직중, 휴직중, 퇴사)", required = false, schema = @Schema(type = "string", allowableValues = {
-              "ACTIVE", "ON_LEAVE", "RESIGNED"})),
-          @Parameter(name = "idAfter", in = ParameterIn.QUERY, description = "이전 페이지 마지막 요소 ID", required = false, schema = @Schema(type = "integer", format = "int64")),
-          @Parameter(name = "cursor", in = ParameterIn.QUERY, description = "커서 (다음 페이지 시작점)", required = false, schema = @Schema(type = "string")),
-          @Parameter(name = "size", in = ParameterIn.QUERY, description = "페이지 크기 (기본값: 10)", required = false, schema = @Schema(type = "integer", format = "int32", defaultValue = "10")),
-          @Parameter(name = "sortField", in = ParameterIn.QUERY, description = "정렬 필드 (name, employeeNumber, hireDate)", required = false, schema = @Schema(type = "string", defaultValue = "name")),
-          @Parameter(name = "sortDirection", in = ParameterIn.QUERY, description = "정렬 방향 (asc 또는 desc, 기본값: asc)", required = false, schema = @Schema(type = "string", defaultValue = "asc"))
-      },
       responses = {
           @ApiResponse(responseCode = "200", description = "조회 성공",
               content = @Content(schema = @Schema(implementation = CursorPageResponseEmployeeDto.class))),
@@ -110,7 +95,18 @@ public interface EmployeeApi {
       }
   )
   ResponseEntity<CursorPageResponseEmployeeDto> findEmployees(
-      @RequestParam(required = false) CursorPageRequestDto cursorPageRequestDto);
+      @RequestParam(required = false) String nameOrEmail,
+      @RequestParam(required = false) String employeeNumber,
+      @RequestParam(required = false) String departmentName,
+      @RequestParam(required = false) String position,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateFrom,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hireDateTo,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) Long idAfter,
+      @RequestParam(required = false) String cursor,
+      @RequestParam(required = false, defaultValue = "10") Integer size,
+      @RequestParam(required = false, defaultValue = "name") String sortField,
+      @RequestParam(required = false, defaultValue = "asc") String sortDirection);
 
   @Operation(
       summary = "직원 상세 조회",
