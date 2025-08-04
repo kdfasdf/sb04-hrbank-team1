@@ -21,7 +21,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>,
   long countByDepartmentId(Long departmentId);
 
   // JOIN FETCH 대체용
-  @EntityGraph(attributePaths = {"department", "fileMetaData"})
+  @EntityGraph(attributePaths = {"department", "fileMetadata"})
   Optional<Employee> findById(Long id);
 
   // 대시보드
