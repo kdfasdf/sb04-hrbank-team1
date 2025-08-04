@@ -6,7 +6,7 @@ import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
-import com.team1.hrbank.global.error.ChangeLogException;
+import com.team1.hrbank.domain.changelog.exception.ChangeLogException;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
@@ -97,6 +97,9 @@ public class ChangeLogService {
     public ChangeLogCountResponse countByPeriod(LocalDateTime fromTemp, LocalDateTime toTemp) {
         LocalDateTime from = fromTemp == null ? LocalDateTime.now().minusDays(7) : fromTemp;
         LocalDateTime to = toTemp == null ? LocalDateTime.now() : toTemp;
+        if (from.isAfter(to)) {
+            throw new ChangeLogException(ChangeLogErrorCode.INVALID_DATE_RANGE);
+        }
         return new ChangeLogCountResponse(changeLogRepository.countByCreatedAtBetween(from, to));
     }
 
