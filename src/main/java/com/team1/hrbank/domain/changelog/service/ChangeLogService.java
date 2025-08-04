@@ -6,17 +6,18 @@ import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.entity.ChangeLog;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogDiff;
 import com.team1.hrbank.domain.changelog.entity.ChangeLogType;
+import com.team1.hrbank.global.error.ChangeLogException;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogDiffMapper;
 import com.team1.hrbank.domain.changelog.mapper.ChangeLogMapper;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogDiffRepository;
 import com.team1.hrbank.domain.changelog.repository.ChangeLogRepository;
 import com.team1.hrbank.domain.employee.entity.Employee;
+import com.team1.hrbank.global.constant.ChangeLogErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
@@ -84,6 +85,7 @@ public class ChangeLogService {
         return switch (sortKey) {
             case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
             case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
+            default -> throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_KEY);
         };
     }
 
@@ -96,6 +98,10 @@ public class ChangeLogService {
 
     //새 직원 객체 생성 후 사용하시면 됩니다
     public void recordCreateLog(Employee employee, String memo, String ipAddress) {
+        if (employee == null || employee.getEmployeeNumber() == null) {
+            throw new ChangeLogException(ChangeLogErrorCode.EMPLOYEE_NUMBER_REQUIRED);
+        }
+
         ChangeLog log = new ChangeLog(
                 employee.getEmployeeNumber(),
                 ChangeLogType.CREATED,
@@ -110,6 +116,10 @@ public class ChangeLogService {
 
     // 업데이트된 객체 생성 후 사용하시면 됩니다. before은 수정 되기 전의 직원 객체
     public void recordUpdateLog(Employee before, Employee after, String memo, String ipAddress) {
+        if (before == null || after == null) {
+            throw new ChangeLogException(ChangeLogErrorCode.EMPLOYEE_BEFORE_AFTER_REQUIRED);
+        }
+
         ChangeLog log = new ChangeLog(
                 before.getEmployeeNumber(),
                 ChangeLogType.UPDATED,
@@ -126,6 +136,10 @@ public class ChangeLogService {
 
     //직원 삭제 전에 사용하시면 됩니다.
     public void recordDeleteLog(Employee employee, String memo, String ipAddress) {
+        if (employee == null || employee.getEmployeeNumber() == null) {
+            throw new ChangeLogException(ChangeLogErrorCode.EMPLOYEE_NUMBER_REQUIRED);
+        }
+
         ChangeLog log = new ChangeLog(
                 employee.getEmployeeNumber(), // 삭제할 직원
                 ChangeLogType.DELETED,
