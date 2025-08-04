@@ -2,12 +2,16 @@ package com.team1.hrbank.domain.file.service;
 
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
-import com.team1.hrbank.global.constant.FileErrorCode;
 import com.team1.hrbank.domain.file.exception.FileException;
+import com.team1.hrbank.global.constant.FileErrorCode;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -162,34 +166,33 @@ public class FileStorageManager {
   }
 
   private File writeCsvFile(File dir, String savedName, List<Employee> employees) {
-    File destFile = new File(dir, savedName);
-    File tempFile = new File(dir, "temp_" + System.currentTimeMillis() + "_");
+    Path dest = dir.toPath().resolve(savedName);
+    Path temp = dir.toPath().resolve("temp_" + System.currentTimeMillis() + "_");
 
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-      for (Employee employee : employees) {
-        writer.write(String.format("%s,%s,%s,%s,%s,%s,%s,%s",
-            employee.getId(),
-            employee.getEmployeeNumber(),
-            employee.getName(), employee.getEmail(),
-            employee.getDepartment().getName(),
-            employee.getPosition(),
-            employee.getHireDate().toString(),
-            employee.getStatus().name()));
+    try (BufferedWriter writer = Files.newBufferedWriter(temp, StandardCharsets.UTF_8)) {
+      for (Employee e : employees) {
+        writer.write(String.join(",",
+            String.valueOf(e.getId()),
+            e.getEmployeeNumber(),
+            e.getName(),
+            e.getEmail(),
+            e.getDepartment().getName(),
+            e.getPosition(),
+            e.getHireDate().toString(),
+            e.getStatus().name()));
         writer.newLine();
       }
-
-      writer.flush();
-
-      // 성공 시에만 최종 파일명으로 변경
-      if (!tempFile.renameTo(destFile)) {
-        log.error("파일 이름 변경 실패: tempFile = {}, destFile = {}", tempFile, destFile);
-        throw new FileException(FileErrorCode.FILE_RENAME_FAILED);
-      }
-
-      return destFile;
-    } catch (IOException e) {
-      log.error("CSV 파일 저장 중 IOException 발생: {}", e.getMessage(), e);
+    } catch (IOException ex) {
+      log.error("CSV 파일 저장 중 IOException: {}", ex.getMessage(), ex);
       throw new FileException(FileErrorCode.CSV_WRITE_FAILED);
+    }
+
+    try {
+      Files.move(temp, dest, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+      return dest.toFile();
+    } catch (IOException ex) {
+      log.error("파일 이동 실패: {} → {}", temp, dest, ex);
+      throw new FileException(FileErrorCode.FILE_RENAME_FAILED);
     }
   }
 
