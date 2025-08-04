@@ -6,6 +6,8 @@ import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
 import com.team1.hrbank.domain.department.service.DepartmentService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
-public class DepartmentController {
+@Tag(name = "부서 관리", description = "부서 관리 API")
+public class DepartmentController implements SwaggerDepartmentController {
 
   private final DepartmentService departmentService;
 
@@ -33,16 +36,18 @@ public class DepartmentController {
     return ResponseEntity.ok(department);
   }
 
-  @PatchMapping(path = "{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<DepartmentDto> update(@PathVariable("id") Long id,
+  @PatchMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+  public ResponseEntity<DepartmentDto> update(
+      @PathVariable("id") Long id,
       @RequestBody DepartmentUpdateRequestDto departmentUpdateRequestDto
   ) {
     DepartmentDto department = departmentService.update(id, departmentUpdateRequestDto);
     return ResponseEntity.ok(department);
   }
 
-  @GetMapping(path = "{id}")
-  public ResponseEntity<DepartmentDto> findOne(@PathVariable("id") Long id) {
+  @GetMapping(path = "/{id}")
+  public ResponseEntity<DepartmentDto> findOne(
+      @PathVariable("id") Long id) {
     DepartmentDto findOne = departmentService.findById(id);
     return ResponseEntity.ok(findOne);
   }
@@ -66,10 +71,9 @@ public class DepartmentController {
   }
 
   @DeleteMapping(path = "{id}")
-  public ResponseEntity<Void> delete(@PathVariable("id") Long id
-  ) {
+  public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
     departmentService.delete(id);
-  return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent().build();
   }
 
 }
