@@ -1,5 +1,7 @@
 package com.team1.hrbank.global.error;
 
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -7,7 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
-  public ErrorResponse handleRuntimeException(BusinessException e) {
-    return new ErrorResponse(e.getErrorCode());
+  public ResponseEntity<ErrorResponse> handleRuntimeException(BusinessException e) {
+    return ResponseEntity.status(e.getErrorCode().getStatus())
+        .body(new ErrorResponse(e.getErrorCode()));
   }
 }
