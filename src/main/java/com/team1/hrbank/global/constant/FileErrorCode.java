@@ -1,6 +1,5 @@
-package com.team1.hrbank.domain.file.exception;
+package com.team1.hrbank.global.constant;
 
-import com.team1.hrbank.global.constant.ErrorCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

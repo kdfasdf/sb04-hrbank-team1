@@ -6,7 +6,7 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
-import com.team1.hrbank.domain.file.exception.FileErrorCode;
+import com.team1.hrbank.global.constant.FileErrorCode;
 import com.team1.hrbank.domain.file.exception.FileException;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
 import java.util.List;

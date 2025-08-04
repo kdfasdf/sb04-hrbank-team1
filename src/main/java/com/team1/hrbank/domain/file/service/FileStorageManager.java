@@ -2,7 +2,7 @@ package com.team1.hrbank.domain.file.service;
 
 import com.team1.hrbank.domain.employee.entity.Employee;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
-import com.team1.hrbank.domain.file.exception.FileErrorCode;
+import com.team1.hrbank.global.constant.FileErrorCode;
 import com.team1.hrbank.domain.file.exception.FileException;
 import java.io.BufferedWriter;
 import java.io.File;
