@@ -138,7 +138,6 @@ public class EmployeeService {
     List<Employee> employees = employeeRepository.findAllEmployeesByRequestNative(
         cursorPageRequestDto);
     Long totalElements = (long) employees.size();
-
     if (totalElements == 0) {
       return new CursorPageResponseEmployeeDto(List.of(), null, null, 0, totalElements,
           false);
@@ -156,9 +155,14 @@ public class EmployeeService {
       }
     }
 
-    int endIndex = (employees.size() - startIndex) % cursorPageRequestDto.size() == 0
-        ? cursorPageRequestDto.size() + startIndex
-        : (employees.size() - startIndex) % cursorPageRequestDto.size() + startIndex;
+    int endIndex = 0;
+    if (idAfter == null) {
+      // 최대 30, 적어도 employees의 크기
+      endIndex = Math.min(employees.size(), cursorPageRequestDto.size());
+    } else {
+      endIndex =
+          Math.min(employees.size() - startIndex, cursorPageRequestDto.size()) + startIndex;
+    }
 
     List<Employee> pagedEmployees = employees.subList(startIndex, endIndex);
     List<EmployeeDto> content = pagedEmployees.stream()
