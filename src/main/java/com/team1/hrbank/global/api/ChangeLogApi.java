@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "직원 정보 수정 이력 관리", description = "직원 정보 수정 이력 관리 API")
-public interface SwaggerChangeLogController {
+public interface ChangeLogApi {
 
     @Operation(summary = "직원 정보 수정 이력 목록 조회", description = "직원 정보 수정 이력 목록을 조회합니다. 상세 변경 내용은 포함되지 않습니다.")
     @ApiResponses(value = {
@@ -56,7 +56,7 @@ public interface SwaggerChangeLogController {
             """)))
     })
     ResponseEntity<List<ChangeLogDiffResponse>> getDiffs(
-            @Parameter(description = "체인지로그 ID") @PathVariable Long changeLogId
+            @Parameter(description = "이력 ID") @PathVariable Long changeLogId
     );
 
     @Operation(summary = "직원 정보 수정 이력 건수 조회", description = "기간 내에 생성된 수정 이력 건수를 조회합니다. 파라미터가 없으면 최근 7일 기준으로 조회됩니다.")
