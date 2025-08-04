@@ -20,6 +20,8 @@ import com.team1.hrbank.domain.employee.dto.request.EmployeeCreateRequestDto;
 import com.team1.hrbank.domain.file.service.FileMetadataService;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
+import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
@@ -187,7 +189,7 @@ public class EmployeeService {
 
     // 중복 확인 후 재귀 호출
     if (employeeRepository.findByEmployeeNumber(employeeNumber).isPresent()) {
-      return createEmployeeNumber(); // 중복 시 다시 생성
+      return createEmployeeNumber(); // 중복 시 다시 생성 1밀리초당 90개의 데이터를 생성하지 않는 이상 이론상 호출되지 않음
     }
 
     return employeeNumber;
@@ -280,13 +282,13 @@ public class EmployeeService {
 
   private void validateDuplicateEmail(String email) {
     if (employeeRepository.findByEmail(email).isPresent()) {
-      throw new IllegalArgumentException("Email already in use");
+      throw new EmployeeException(EmployeeErrorCode.EMPLOYEE_EMAIL_DUPLICATE);
     }
   }
 
   private Employee getValidateEmployee(long employeeId) {
     return employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new IllegalArgumentException("Employee not found"));
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
   }
 
   // 대시보드 공통 메서드

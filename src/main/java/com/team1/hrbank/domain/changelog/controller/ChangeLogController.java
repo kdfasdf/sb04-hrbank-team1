@@ -2,7 +2,6 @@ package com.team1.hrbank.domain.changelog.controller;
 
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogDiffResponse;
 import com.team1.hrbank.domain.changelog.dto.request.ChangeLogSearchRequest;
-import com.team1.hrbank.domain.changelog.dto.response.ChangeLogCountResponse;
 import com.team1.hrbank.domain.changelog.dto.response.ChangeLogSearchResponse;
 import com.team1.hrbank.domain.changelog.service.ChangeLogDiffService;
 import com.team1.hrbank.domain.changelog.service.ChangeLogService;
@@ -37,12 +36,11 @@ public class ChangeLogController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<ChangeLogCountResponse> getChangeLogsCount(
+    public ResponseEntity<Long> getChangeLogsCount(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
-    ){
-        ChangeLogCountResponse count = changeLogService.countByPeriod(fromDate, toDate);
-        return ResponseEntity.ok(count);
+    ) {
+        return ResponseEntity.ok(changeLogService.countByPeriod(fromDate, toDate));
     }
 }
 
