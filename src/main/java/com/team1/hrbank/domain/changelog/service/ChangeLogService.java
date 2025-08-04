@@ -36,18 +36,38 @@ public class ChangeLogService {
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
         int limit = DEFAULT_PAGE_SIZE + 1;
 
-        List<ChangeLog> changeLogs = changeLogRepository.findAllByCondition(
-                request.employeeNumber(),
-                request.memo(),
-                request.ipAddress(),
-                request.type() != null ? request.type().name() : null,
-                request.from(),
-                request.to(),
-                request.lastId(),
-                getDirection(request.sortKey()),
-                request.sortKey().name(),
-                limit
-        );
+        String sortField = request.sortField() != null ? request.sortField() : "at";
+        String sortDirection = request.sortDirection() != null ? request.sortDirection() : "DESC";
+
+        List<ChangeLog> changeLogs;
+
+        if (sortField.equals("at") && sortDirection.equalsIgnoreCase("ASC")) {
+            changeLogs = changeLogRepository.findAllOrderByCreatedAtAsc(
+                    request.employeeNumber(), request.memo(), request.ipAddress(),
+                    request.type() != null ? request.type().name() : null,
+                    request.from(), request.to(), request.lastId(), limit
+            );
+        } else if (sortField.equals("at") && sortDirection.equalsIgnoreCase("DESC")) {
+            changeLogs = changeLogRepository.findAllOrderByCreatedAtDesc(
+                    request.employeeNumber(), request.memo(), request.ipAddress(),
+                    request.type() != null ? request.type().name() : null,
+                    request.from(), request.to(), request.lastId(), limit
+            );
+        } else if (sortField.equals("ipAddress") && sortDirection.equalsIgnoreCase("ASC")) {
+            changeLogs = changeLogRepository.findAllOrderByIpAddressAsc(
+                    request.employeeNumber(), request.memo(), request.ipAddress(),
+                    request.type() != null ? request.type().name() : null,
+                    request.from(), request.to(), request.lastId(), limit
+            );
+        } else if (sortField.equals("ipAddress") && sortDirection.equalsIgnoreCase("DESC")) {
+            changeLogs = changeLogRepository.findAllOrderByIpAddressDesc(
+                    request.employeeNumber(), request.memo(), request.ipAddress(),
+                    request.type() != null ? request.type().name() : null,
+                    request.from(), request.to(), request.lastId(), limit
+            );
+        } else {
+            throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_PARAMETER);
+        }
 
         boolean hasNext = changeLogs.size() > DEFAULT_PAGE_SIZE;
         Long nextId = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
@@ -60,12 +80,9 @@ public class ChangeLogService {
         }
 
         long totalCount = changeLogRepository.countByCondition(
-                request.employeeNumber(),
-                request.memo(),
-                request.ipAddress(),
+                request.employeeNumber(), request.memo(), request.ipAddress(),
                 request.type() != null ? request.type().name() : null,
-                request.from(),
-                request.to()
+                request.from(), request.to()
         );
 
         return new ChangeLogSearchResponse(
@@ -76,18 +93,6 @@ public class ChangeLogService {
                 totalCount,
                 hasNext
         );
-    }
-
-    private String getDirection(ChangeLogSearchRequest.SortKey sortKey) {
-        if (sortKey == null) {
-            throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_KEY);
-        }
-
-        return switch (sortKey) {
-            case CREATED_AT_ASC, IP_ADDRESS_ASC -> "ASC";
-            case CREATED_AT_DESC, IP_ADDRESS_DESC -> "DESC";
-            default -> throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_KEY);
-        };
     }
 
     @Transactional(readOnly = true)
