@@ -184,7 +184,8 @@ public class BackupService {
 
   @Transactional(readOnly = true)
   public BackupDto findLatest(String status) {
-    Backup backup = backupRepository.findFirstByStatusOrderByCreatedAtDesc(status)
+
+    Backup backup = backupRepository.findFirstByStatusOrderByCreatedAtDesc(BackupStatus.valueOf(status))
         .orElseThrow(() -> new IllegalStateException("최신 백업 상태 없음"));
     return backMapper.toDto(backup);
   }
