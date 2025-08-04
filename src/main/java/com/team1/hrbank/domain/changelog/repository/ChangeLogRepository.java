@@ -12,21 +12,21 @@ import java.util.Optional;
 public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
 
     @Query(value = """
-            SELECT * FROM change_logs
-            WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-              AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-              AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-              AND (:type IS NULL OR type = :type)
-              AND (
-                  (:from IS NULL AND :to IS NULL)
-                  OR (:from IS NULL AND created_at <= :to)
-                  OR (:to IS NULL AND created_at >= :from)
-                  OR (created_at BETWEEN :from AND :to)
-              )
-              AND (:lastId IS NULL OR id > :lastId)
-            ORDER BY created_at ASC
-            LIMIT :limit
-            """, nativeQuery = true)
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR LOWER(employee_number) LIKE CONCAT('%', LOWER(:employeeNumber), '%'))
+          AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id > :lastId)
+        ORDER BY created_at ASC
+        LIMIT :limit
+        """, nativeQuery = true)
     List<ChangeLog> findAllOrderByCreatedAtAsc(
             @Param("employeeNumber") String employeeNumber,
             @Param("memo") String memo,
@@ -39,21 +39,21 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
     );
 
     @Query(value = """
-            SELECT * FROM change_logs
-            WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-              AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-              AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-              AND (:type IS NULL OR type = :type)
-              AND (
-                  (:from IS NULL AND :to IS NULL)
-                  OR (:from IS NULL AND created_at <= :to)
-                  OR (:to IS NULL AND created_at >= :from)
-                  OR (created_at BETWEEN :from AND :to)
-              )
-              AND (:lastId IS NULL OR id < :lastId)
-            ORDER BY created_at DESC
-            LIMIT :limit
-            """, nativeQuery = true)
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR LOWER(employee_number) LIKE CONCAT('%', LOWER(:employeeNumber), '%'))
+          AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id < :lastId)
+        ORDER BY created_at DESC
+        LIMIT :limit
+        """, nativeQuery = true)
     List<ChangeLog> findAllOrderByCreatedAtDesc(
             @Param("employeeNumber") String employeeNumber,
             @Param("memo") String memo,
@@ -66,21 +66,21 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
     );
 
     @Query(value = """
-            SELECT * FROM change_logs
-            WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-              AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-              AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-              AND (:type IS NULL OR type = :type)
-              AND (
-                  (:from IS NULL AND :to IS NULL)
-                  OR (:from IS NULL AND created_at <= :to)
-                  OR (:to IS NULL AND created_at >= :from)
-                  OR (created_at BETWEEN :from AND :to)
-              )
-              AND (:lastId IS NULL OR id > :lastId)
-            ORDER BY ip_address ASC
-            LIMIT :limit
-            """, nativeQuery = true)
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR LOWER(employee_number) LIKE CONCAT('%', LOWER(:employeeNumber), '%'))
+          AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id > :lastId)
+        ORDER BY ip_address ASC
+        LIMIT :limit
+        """, nativeQuery = true)
     List<ChangeLog> findAllOrderByIpAddressAsc(
             @Param("employeeNumber") String employeeNumber,
             @Param("memo") String memo,
@@ -93,21 +93,21 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
     );
 
     @Query(value = """
-            SELECT * FROM change_logs
-            WHERE (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-              AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-              AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-              AND (:type IS NULL OR type = :type)
-              AND (
-                  (:from IS NULL AND :to IS NULL)
-                  OR (:from IS NULL AND created_at <= :to)
-                  OR (:to IS NULL AND created_at >= :from)
-                  OR (created_at BETWEEN :from AND :to)
-              )
-              AND (:lastId IS NULL OR id < :lastId)
-            ORDER BY ip_address DESC
-            LIMIT :limit
-            """, nativeQuery = true)
+        SELECT * FROM change_logs
+        WHERE (:employeeNumber IS NULL OR LOWER(employee_number) LIKE CONCAT('%', LOWER(:employeeNumber), '%'))
+          AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
+          AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
+          AND (:type IS NULL OR type = :type)
+          AND (
+              (:from IS NULL AND :to IS NULL)
+              OR (:from IS NULL AND created_at <= :to)
+              OR (:to IS NULL AND created_at >= :from)
+              OR (created_at BETWEEN :from AND :to)
+          )
+          AND (:lastId IS NULL OR id < :lastId)
+        ORDER BY ip_address DESC
+        LIMIT :limit
+        """, nativeQuery = true)
     List<ChangeLog> findAllOrderByIpAddressDesc(
             @Param("employeeNumber") String employeeNumber,
             @Param("memo") String memo,
@@ -120,20 +120,20 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
     );
 
     @Query(value = """
-            SELECT COUNT(*) 
-            FROM change_logs
-            WHERE
-                (:employeeNumber IS NULL OR employee_number = :employeeNumber)
-                AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
-                AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
-                AND (:type IS NULL OR CAST(type AS VARCHAR) = :type)
-                AND (
-                    (:from IS NULL AND :to IS NULL)
-                    OR (:from IS NULL AND created_at <= :to)
-                    OR (:to IS NULL AND created_at >= :from)
-                    OR (created_at BETWEEN :from AND :to)
-                )
-            """, nativeQuery = true)
+        SELECT COUNT(*)
+        FROM change_logs
+        WHERE
+            (:employeeNumber IS NULL OR LOWER(employee_number) LIKE CONCAT('%', LOWER(:employeeNumber), '%'))
+            AND (:memo IS NULL OR LOWER(memo) LIKE CONCAT('%', LOWER(:memo), '%'))
+            AND (:ipAddress IS NULL OR LOWER(ip_address) LIKE CONCAT('%', LOWER(:ipAddress), '%'))
+            AND (:type IS NULL OR CAST(type AS VARCHAR) = :type)
+            AND (
+                (:from IS NULL AND :to IS NULL)
+                OR (:from IS NULL AND created_at <= :to)
+                OR (:to IS NULL AND created_at >= :from)
+                OR (created_at BETWEEN :from AND :to)
+            )
+        """, nativeQuery = true)
     long countByCondition(
             @Param("employeeNumber") String employeeNumber,
             @Param("memo") String memo,
@@ -144,10 +144,10 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
     );
 
     @Query(value = """
-            SELECT COUNT(*)
-            FROM change_logs
-            WHERE created_at BETWEEN :from AND :to
-            """, nativeQuery = true)
+        SELECT COUNT(*)
+        FROM change_logs
+        WHERE created_at BETWEEN :from AND :to
+        """, nativeQuery = true)
     long countByCreatedAtBetween(
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
