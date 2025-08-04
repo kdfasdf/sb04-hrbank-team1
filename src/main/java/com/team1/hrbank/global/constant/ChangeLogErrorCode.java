@@ -12,11 +12,7 @@ public enum ChangeLogErrorCode implements ErrorCode{
     EMPLOYEE_NUMBER_REQUIRED(400, "CHANGE_LOG_003", "직원 사번 정보가 누락되었습니다.");
 
     private final int status;
-    private final String code;
     private final String message;
+    private final String details;
 
-    @Override
-    public String getDetails() {
-        return status + ": " + message;
-    }
 }
