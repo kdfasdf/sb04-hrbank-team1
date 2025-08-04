@@ -6,6 +6,10 @@ import com.team1.hrbank.domain.employee.repository.EmployeeRepository;
 import com.team1.hrbank.domain.file.dto.StoredFileInfo;
 import com.team1.hrbank.domain.file.entity.FileMetadata;
 import com.team1.hrbank.domain.file.entity.FileType;
+import com.team1.hrbank.global.constant.FileErrorCode;
+import com.team1.hrbank.global.constant.EmployeeErrorCode;
+import com.team1.hrbank.domain.file.exception.FileException;
+import com.team1.hrbank.domain.employee.exception.EmployeeException;
 import com.team1.hrbank.domain.file.repository.FileMetadataRepository;
 import com.team1.hrbank.global.constant.EmployeeErrorCode;
 import com.team1.hrbank.domain.employee.exception.EmployeeException;
@@ -28,7 +32,7 @@ public class FileMetadataService {
   @Transactional
   public FileMetadata uploadProfileImage(Long employeeId, MultipartFile file) {
     Employee employee = employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND));
+        .orElseThrow(() -> new EmployeeException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND);
 
     // 기존 이미지 삭제
     FileMetadata oldMeta = employee.getFileMetadata();
@@ -84,7 +88,7 @@ public class FileMetadataService {
   @Transactional(readOnly = true)
   public Resource downloadFile(Long id) {
     FileMetadata metadata = fileMetadataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 메타데이터가 존재하지 않습니다: " + id));
+        .orElseThrow(() -> new FileException(FileErrorCode.FILE_NOT_FOUND));
 
     return fileStorageManager.downloadFile(metadata.getFilePath());
   }
@@ -92,7 +96,6 @@ public class FileMetadataService {
   @Transactional(readOnly = true)
   public FileMetadata getFileMetadata(Long id) {
     return fileMetadataRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("해당 ID의 파일 메타데이터가 존재하지 않습니다: " + id));
+        .orElseThrow(() -> new FileException(FileErrorCode.FILE_NOT_FOUND));
   }
-
 }
