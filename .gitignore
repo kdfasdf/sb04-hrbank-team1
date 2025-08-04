@@ -25,6 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+/db/*.mv.db
+/db/*.trace.db
 
 ### NetBeans ###
 /nbproject/private/
