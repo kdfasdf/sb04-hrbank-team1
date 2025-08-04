@@ -37,12 +37,11 @@ public class ChangeLogController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<ChangeLogCountResponse> getChangeLogsCount(
+    public ResponseEntity<Long> getChangeLogsCount(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
-    ){
-        ChangeLogCountResponse count = changeLogService.countByPeriod(fromDate, toDate);
-        return ResponseEntity.ok(count);
+    ) {
+        return ResponseEntity.ok(changeLogService.countByPeriod(fromDate, toDate));
     }
 }
 
