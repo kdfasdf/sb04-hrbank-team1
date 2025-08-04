@@ -189,7 +189,7 @@ public class EmployeeService {
 
     // 중복 확인 후 재귀 호출
     if (employeeRepository.findByEmployeeNumber(employeeNumber).isPresent()) {
-      return createEmployeeNumber(); // 중복 시 다시 생성
+      return createEmployeeNumber(); // 중복 시 다시 생성 1밀리초당 90개의 데이터를 생성하지 않는 이상 이론상 호출되지 않음
     }
 
     return employeeNumber;
