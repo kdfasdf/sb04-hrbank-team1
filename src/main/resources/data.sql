@@ -127,45 +127,23 @@ VALUES (101, 101, '입사 상태', NULL, '신규 입사 등록', '2025-08-05 09:
 
 -- backups
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (101, '2025-07-18T00:00:00', '2025-07-18T00:03:00', 102, 'IN_PROGRESS', '192.168.0.2',
-        NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (103, '2025-07-19T00:00:00', '2025-07-19T00:04:00', 103, 'IN_PROGRESS', '192.168.0.3',
-        NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (104, '2025-07-20T00:00:00', '2025-07-20T00:02:00', 105, 'SKIPPED', '192.168.0.4', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (105, '2025-07-21T00:00:00', '2025-07-21T00:05:00', 104, 'FAIL', '192.168.0.5', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (106, '2025-07-22T00:00:00', '2025-07-22T00:02:00', 106, 'IN_PROGRESS', '192.168.0.6',
-        NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (107, '2025-07-23T00:00:00', '2025-07-23T00:05:00', 107, 'COMPLETED', '192.168.0.7', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (108, '2025-07-24T00:00:00', '2025-07-24T00:03:00', 108, 'COMPLETED', '192.168.0.8', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (109, '2025-07-25T00:00:00', '2025-07-25T00:05:00', 109, 'FAIL', '192.168.0.9',
-        NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (110, '2025-07-26T00:00:00', '2025-07-26T00:05:00', 114, 'FAIL', '192.168.0.10', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (111, '2025-07-27T00:00:00', '2025-07-27T00:02:00', 119, 'FAIL', '192.168.0.11', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (112, '2025-07-28T00:00:00', '2025-07-28T00:02:00', 112, 'COMPLETED', '192.168.0.12', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (113, '2025-07-29T00:00:00', '2025-07-29T00:05:00', 113, 'SKIPPED', '192.168.0.13', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (114, '2025-07-30T00:00:00', '2025-07-30T00:05:00', 110, 'COMPLETED', '192.168.0.14', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (115, '2025-07-31T00:00:00', '2025-07-31T00:02:00', 115, 'COMPLETED', '192.168.0.15', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (116, '2025-08-01T00:00:00', '2025-08-01T00:03:00', 116, 'SKIPPED', '192.168.0.16', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (117, '2025-08-02T00:00:00', '2025-08-02T00:04:00', 117, 'SKIPPED', '192.168.0.17', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (118, '2025-08-03T00:00:00', '2025-08-03T00:05:00', 118, 'IN_PROGRESS', '192.168.0.18',
-        NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (119, '2025-08-04T00:00:00', '2025-08-04T00:05:00', 111, 'COMPLETED', '192.168.0.19', NOW());
-INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (120, '2025-08-05T00:00:00', '2025-08-05T00:02:00', 120, 'SKIPPED', '192.168.0.20', NOW());
+VALUES
+    (101, '2025-07-18T00:00:00', '2025-07-18T00:03:00', 102, 'IN_PROGRESS', '192.168.0.2', NOW()),
+    (103, '2025-07-19T00:00:00', '2025-07-19T00:04:00', 103, 'IN_PROGRESS', '192.168.0.3', NOW()),
+    (104, '2025-07-20T00:00:00', '2025-07-20T00:02:00', 105, 'SKIPPED', '192.168.0.4', NOW()),
+    (105, '2025-07-21T00:00:00', '2025-07-21T00:05:00', 104, 'FAILED', '192.168.0.5', NOW()),
+    (106, '2025-07-22T00:00:00', '2025-07-22T00:02:00', 106, 'IN_PROGRESS', '192.168.0.6', NOW()),
+    (107, '2025-07-23T00:00:00', '2025-07-23T00:05:00', 107, 'COMPLETED', '192.168.0.7', NOW()),
+    (108, '2025-07-24T00:00:00', '2025-07-24T00:03:00', 108, 'COMPLETED', '192.168.0.8', NOW()),
+    (109, '2025-07-25T00:00:00', '2025-07-25T00:05:00', 109, 'FAILED', '192.168.0.9', NOW()),
+    (110, '2025-07-26T00:00:00', '2025-07-26T00:05:00', 114, 'FAILED', '192.168.0.10', NOW()),
+    (111, '2025-07-27T00:00:00', '2025-07-27T00:02:00', 119, 'FAILED', '192.168.0.11', NOW()),
+    (112, '2025-07-28T00:00:00', '2025-07-28T00:02:00', 112, 'COMPLETED', '192.168.0.12', NOW()),
+    (113, '2025-07-29T00:00:00', '2025-07-29T00:05:00', 113, 'SKIPPED', '192.168.0.13', NOW()),
+    (114, '2025-07-30T00:00:00', '2025-07-30T00:05:00', 110, 'COMPLETED', '192.168.0.14', NOW()),
+    (115, '2025-07-31T00:00:00', '2025-07-31T00:02:00', 115, 'COMPLETED', '192.168.0.15', NOW()),
+    (116, '2025-08-01T00:00:00', '2025-08-01T00:03:00', 116, 'SKIPPED', '192.168.0.16', NOW()),
+    (117, '2025-08-02T00:00:00', '2025-08-02T00:04:00', 117, 'SKIPPED', '192.168.0.17', NOW()),
+    (118, '2025-08-03T00:00:00', '2025-08-03T00:05:00', 118, 'IN_PROGRESS', '192.168.0.18', NOW()),
+    (119, '2025-08-04T00:00:00', '2025-08-04T00:05:00', 111, 'COMPLETED', '192.168.0.19', NOW()),
+    (120, '2025-08-05T00:00:00', '2025-08-05T00:02:00', 120, 'SKIPPED', '192.168.0.20', NOW());
