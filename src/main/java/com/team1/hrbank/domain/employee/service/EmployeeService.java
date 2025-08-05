@@ -149,7 +149,7 @@ public class EmployeeService {
     if (idAfter != null) {
       for (int i = 0; i < employees.size(); i++) {
         if (employees.get(i).getId().equals(idAfter)) {
-          startIndex = i - 1;
+          startIndex = i + 1;
           break;
         }
       }
