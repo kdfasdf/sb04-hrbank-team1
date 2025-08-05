@@ -56,6 +56,7 @@ public class BackupService {
 
       FileMetadata fileMetaData = fileMetaDataService.generateBackupFile(backup.getId(),
           employees);
+
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
