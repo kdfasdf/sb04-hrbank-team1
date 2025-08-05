@@ -2,18 +2,24 @@ spring:
   config:
     activate:
       on-profiles: dev # dev 프로필 활성화 시 이 설정 적용
+
   datasource:
     url: jdbc:h2:mem:testdb # 메모리 기반 H2 DB (인메모리라 서버 재시작 시 데이터 초기화)
     driver-class-name: org.h2.Driver
     username: hrbank
     password: hrbank1234
+
   jpa:
     hibernate:
-      ddl-auto: update # 엔티티 기반으로 테이블 싀마 자동 변경, 기존 데이터 유지
+      ddl-auto: create
+    defer-datasource-initialization: true # 데이터 소스 초기화 시점 지연(sql 파일 실행 시점 뒤로)
     show-sql: true # 실행되는 SQL 쿼리 콘솔 출력
     properties:
       hibernate:
         format_sql: true # SQL 쿼리를 보기 좋게 포맷팅
+  sql:
+    init:
+      mode: always #data.sql 항상 실행
   h2:
     console:
       enabled: true       # H2 콘솔 활성화
