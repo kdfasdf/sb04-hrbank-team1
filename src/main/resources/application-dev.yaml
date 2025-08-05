@@ -3,7 +3,7 @@ spring:
     activate:
       on-profiles: dev
   datasource:
-    url: jdbc:h2:~/hrbank
+    url: jdbc:h2:file:./db/hrbank-db
     username: hrbank
     password: hrbank1234
   jpa:
