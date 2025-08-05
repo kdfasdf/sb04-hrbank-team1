@@ -61,8 +61,6 @@ public class BackupService {
 
     } catch (Exception e) {
       fileMetaDataService.generateErrorLogFile(backup.getId(), e.getMessage());
-      backup.setEndedAt(LocalDateTime.now());
-      backupRepository.save(backup);
       throw new BackupException(BakcupErrorCode.BACKUP_FAILED);
     }
   }
