@@ -22,12 +22,7 @@ spring:
     console:
       enabled: true       # H2 콘솔 활성화
       path: /h2-console   # 접속 경로 지정 (기본: /h2-console)
+
   logging:
     level:
       org.hibernate.type: INFO # Hibernate가 SQL 타입 매핑 로그 출력
-
-    http:
-      encoding:
-        enabled: true
-        charset: UTF-8
-        force: true
