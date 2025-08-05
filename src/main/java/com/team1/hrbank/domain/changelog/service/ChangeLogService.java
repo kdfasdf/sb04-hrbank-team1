@@ -34,10 +34,14 @@ public class ChangeLogService {
 
     @Transactional(readOnly = true)
     public ChangeLogSearchResponse findAll(ChangeLogSearchRequest request) {
-        int limit = DEFAULT_PAGE_SIZE + 1;
+        int limit = (request.size() != null ? request.size() : DEFAULT_PAGE_SIZE) + 1;
 
         String sortField = request.sortField() != null ? request.sortField() : "at";
         String sortDirection = request.sortDirection() != null ? request.sortDirection() : "DESC";
+
+        Long idAfter = request.cursor() != null
+                ? extractIdFromCursor(request.cursor())
+                : request.idAfter();
 
         List<ChangeLog> changeLogs;
 
@@ -45,51 +49,51 @@ public class ChangeLogService {
             changeLogs = changeLogRepository.findAllOrderByCreatedAtAsc(
                     request.employeeNumber(), request.memo(), request.ipAddress(),
                     request.type() != null ? request.type().name() : null,
-                    request.from(), request.to(), request.lastId(), limit
+                    request.atFrom(), request.atTo(), idAfter, limit
             );
         } else if (sortField.equals("at") && sortDirection.equalsIgnoreCase("DESC")) {
             changeLogs = changeLogRepository.findAllOrderByCreatedAtDesc(
                     request.employeeNumber(), request.memo(), request.ipAddress(),
                     request.type() != null ? request.type().name() : null,
-                    request.from(), request.to(), request.lastId(), limit
+                    request.atFrom(), request.atTo(), idAfter, limit
             );
         } else if (sortField.equals("ipAddress") && sortDirection.equalsIgnoreCase("ASC")) {
             changeLogs = changeLogRepository.findAllOrderByIpAddressAsc(
                     request.employeeNumber(), request.memo(), request.ipAddress(),
                     request.type() != null ? request.type().name() : null,
-                    request.from(), request.to(), request.lastId(), limit
+                    request.atFrom(), request.atTo(), idAfter, limit
             );
         } else if (sortField.equals("ipAddress") && sortDirection.equalsIgnoreCase("DESC")) {
             changeLogs = changeLogRepository.findAllOrderByIpAddressDesc(
                     request.employeeNumber(), request.memo(), request.ipAddress(),
                     request.type() != null ? request.type().name() : null,
-                    request.from(), request.to(), request.lastId(), limit
+                    request.atFrom(), request.atTo(), idAfter, limit
             );
         } else {
             throw new ChangeLogException(ChangeLogErrorCode.INVALID_SORT_PARAMETER);
         }
 
-        boolean hasNext = changeLogs.size() > DEFAULT_PAGE_SIZE;
-        Long nextId = hasNext ? changeLogs.get(DEFAULT_PAGE_SIZE).getId() : null;
+        boolean hasNext = changeLogs.size() > (limit - 1);
+        Long nextId = hasNext ? changeLogs.get(limit - 1).getId() : null;
         String nextCursor = nextId != null
                 ? Base64.getEncoder().encodeToString(("{\"id\":" + nextId + "}").getBytes(StandardCharsets.UTF_8))
                 : null;
 
         if (hasNext) {
-            changeLogs = changeLogs.subList(0, DEFAULT_PAGE_SIZE);
+            changeLogs = changeLogs.subList(0, limit - 1);
         }
 
         long totalCount = changeLogRepository.countByCondition(
                 request.employeeNumber(), request.memo(), request.ipAddress(),
                 request.type() != null ? request.type().name() : null,
-                request.from(), request.to()
+                request.atFrom(), request.atTo()
         );
 
         return new ChangeLogSearchResponse(
                 changeLogs.stream().map(changeLogMapper::toDto).toList(),
                 nextCursor,
                 nextId,
-                DEFAULT_PAGE_SIZE,
+                limit - 1,
                 totalCount,
                 hasNext
         );
@@ -156,5 +160,10 @@ public class ChangeLogService {
 
         List<ChangeLogDiff> diffs = changeLogDiffMapper.fromDelete(log, employee);
         changeLogDiffRepository.saveAll(diffs);
+    }
+
+    private Long extractIdFromCursor(String cursor) {
+            String decoded = new String(Base64.getDecoder().decode(cursor), StandardCharsets.UTF_8);
+            return Long.valueOf(decoded.replaceAll("[^0-9]", ""));
     }
 }

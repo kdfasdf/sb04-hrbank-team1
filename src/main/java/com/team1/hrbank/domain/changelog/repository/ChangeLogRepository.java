@@ -23,7 +23,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
               OR (:to IS NULL AND created_at >= :from)
               OR (created_at BETWEEN :from AND :to)
           )
-          AND (:lastId IS NULL OR id > :lastId)
+          AND (:idAfter IS NULL OR id > :idAfter)
         ORDER BY created_at ASC
         LIMIT :limit
         """, nativeQuery = true)
@@ -34,7 +34,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("type") String type,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to,
-            @Param("lastId") Long lastId,
+            @Param("idAfter") Long idAfter,
             @Param("limit") int limit
     );
 
@@ -50,7 +50,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
               OR (:to IS NULL AND created_at >= :from)
               OR (created_at BETWEEN :from AND :to)
           )
-          AND (:lastId IS NULL OR id < :lastId)
+          AND (:idAfter IS NULL OR id < :idAfter)
         ORDER BY created_at DESC
         LIMIT :limit
         """, nativeQuery = true)
@@ -61,7 +61,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("type") String type,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to,
-            @Param("lastId") Long lastId,
+            @Param("idAfter") Long idAfter,
             @Param("limit") int limit
     );
 
@@ -77,7 +77,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
               OR (:to IS NULL AND created_at >= :from)
               OR (created_at BETWEEN :from AND :to)
           )
-          AND (:lastId IS NULL OR id > :lastId)
+          AND (:idAfter IS NULL OR id > :idAfter)
         ORDER BY ip_address ASC
         LIMIT :limit
         """, nativeQuery = true)
@@ -88,7 +88,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("type") String type,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to,
-            @Param("lastId") Long lastId,
+            @Param("idAfter") Long idAfter,
             @Param("limit") int limit
     );
 
@@ -104,7 +104,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
               OR (:to IS NULL AND created_at >= :from)
               OR (created_at BETWEEN :from AND :to)
           )
-          AND (:lastId IS NULL OR id < :lastId)
+          AND (:idAfter IS NULL OR id < :idAfter)
         ORDER BY ip_address DESC
         LIMIT :limit
         """, nativeQuery = true)
@@ -115,7 +115,7 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("type") String type,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to,
-            @Param("lastId") Long lastId,
+            @Param("idAfter") Long idAfter,
             @Param("limit") int limit
     );
 
@@ -153,6 +153,5 @@ public interface ChangeLogRepository extends JpaRepository<ChangeLog, Long> {
             @Param("to") LocalDateTime to
     );
 
-    @Query("SELECT c FROM ChangeLog c ORDER BY c.updatedAt DESC")
-    Optional<ChangeLog> findFirstByUpdatedAtDesc();
+    Optional<ChangeLog> findFirstByOrderByUpdatedAtDesc();
 }
