@@ -4,5 +4,5 @@ public enum BackupStatus {
   IN_PROGRESS,
   COMPLETED,
   SKIPPED,
-  FAIL
+  FAILED
 }
