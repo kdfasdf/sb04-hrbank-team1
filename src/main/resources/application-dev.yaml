@@ -25,3 +25,9 @@ spring:
   logging:
     level:
       org.hibernate.type: INFO # Hibernate가 SQL 타입 매핑 로그 출력
+
+    http:
+      encoding:
+        enabled: true
+        charset: UTF-8
+        force: true
