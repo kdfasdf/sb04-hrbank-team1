@@ -144,10 +144,10 @@ VALUES (107, '2025-07-23T00:00:00', '2025-07-23T00:05:00', 107, 'COMPLETED', '19
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
 VALUES (108, '2025-07-24T00:00:00', '2025-07-24T00:03:00', 108, 'COMPLETED', '192.168.0.8', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (109, '2025-07-25T00:00:00', '2025-07-25T00:05:00', 109, 'IN_PROGRESS', '192.168.0.9',
+VALUES (109, '2025-07-25T00:00:00', '2025-07-25T00:05:00', 109, 'FAIL', '192.168.0.9',
         NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (110, '2025-07-2600:00:00', '2025-07-26T00:05:00', 114, 'FAIL', '192.168.0.10', NOW());
+VALUES (110, '2025-07-26T00:00:00', '2025-07-26T00:05:00', 114, 'FAIL', '192.168.0.10', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
 VALUES (111, '2025-07-27T00:00:00', '2025-07-27T00:02:00', 119, 'FAIL', '192.168.0.11', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
@@ -155,7 +155,7 @@ VALUES (112, '2025-07-28T00:00:00', '2025-07-28T00:02:00', 112, 'COMPLETED', '19
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
 VALUES (113, '2025-07-29T00:00:00', '2025-07-29T00:05:00', 113, 'SKIPPED', '192.168.0.13', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (114, '2025-07-30T00:00:00', '2025-07-30T00:05:00', 110, 'FAIL', '192.168.0.14', NOW());
+VALUES (114, '2025-07-30T00:00:00', '2025-07-30T00:05:00', 110, 'COMPLETED', '192.168.0.14', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
 VALUES (115, '2025-07-31T00:00:00', '2025-07-31T00:02:00', 115, 'COMPLETED', '192.168.0.15', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
@@ -166,6 +166,6 @@ INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, upda
 VALUES (118, '2025-08-03T00:00:00', '2025-08-03T00:05:00', 118, 'IN_PROGRESS', '192.168.0.18',
         NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
-VALUES (119, '2025-08-04T00:00:00', '2025-08-04T00:05:00', 111, 'FAIL', '192.168.0.19', NOW());
+VALUES (119, '2025-08-04T00:00:00', '2025-08-04T00:05:00', 111, 'COMPLETED', '192.168.0.19', NOW());
 INSERT INTO backups (id, created_at, ended_at, metadata_id, status, worker, updated_at)
 VALUES (120, '2025-08-05T00:00:00', '2025-08-05T00:02:00', 120, 'SKIPPED', '192.168.0.20', NOW());
