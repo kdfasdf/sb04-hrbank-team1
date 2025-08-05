@@ -4,7 +4,11 @@ spring:
       on-profiles: dev # dev 프로필 활성화 시 이 설정 적용
 
   datasource:
-    url: jdbc:h2:mem:testdb # 메모리 기반 H2 DB (인메모리라 서버 재시작 시 데이터 초기화)
+    #url: jdbc:h2:mem:testdb # 메모리 기반 H2 DB (인메모리라 서버 재시작 시 데이터 초기화)
+    url: jdbc:h2:file:./data/testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    #jdbc:h2:file:./data/testdb: H2가 파일로 DB를 저장하도록 설정
+    #DB_CLOSE_DELAY=-1: 애플리케이션 종료 후에도 DB를 유지
+    #DB_CLOSE_ON_EXIT=FALSE: 정상 종료 시에도 파일 유지
     driver-class-name: org.h2.Driver
     username: hrbank
     password: hrbank1234
