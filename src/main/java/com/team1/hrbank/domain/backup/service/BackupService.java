@@ -160,12 +160,12 @@ public class BackupService {
 
     if (startedAtFrom != null) {
       spec = spec.and((root, query, cb) ->
-          cb.greaterThanOrEqualTo(root.get("startedAt"), startedAtFrom));
+          cb.greaterThanOrEqualTo(root.get("createdAt"), startedAtFrom));
     }
 
     if (startedAtTo != null) {
       spec = spec.and((root, query, cb) ->
-          cb.lessThanOrEqualTo(root.get("startedAt"), startedAtTo));
+          cb.lessThanOrEqualTo(root.get("createdAt"), startedAtTo));
     }
 
     if (idAfter != null) {
@@ -188,7 +188,7 @@ public class BackupService {
   @Transactional(readOnly = true)
   public BackupDto findLatest(String status) {
     Backup backup = backupRepository.findFirstByStatusOrderByCreatedAtDesc(BackupStatus.valueOf(status))
-        .orElseThrow(() -> new BackupException(BakcupErrorCode.RECENT_BACKUP_NOT_EXIST));
+        .orElse(null);
     return backMapper.toDto(backup);
   }
 }

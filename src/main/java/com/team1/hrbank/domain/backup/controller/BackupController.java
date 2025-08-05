@@ -8,6 +8,7 @@ import com.team1.hrbank.global.api.BackupApi;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +40,9 @@ public class BackupController implements BackupApi {
   public ResponseEntity<CursorPageResponseBackupDto> findAll(
       @RequestParam(required = false) String worker,
       @RequestParam(required = false) BackupStatus status,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
       @RequestParam(required = false) LocalDateTime startedAtFrom,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
       @RequestParam(required = false) LocalDateTime startedAtTo,
       @RequestParam(required = false) Long idAfter,
       @RequestParam(required = false) String cursor,  //zondatatime
