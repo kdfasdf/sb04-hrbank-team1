@@ -17,6 +17,7 @@ spring:
         format_sql: true # SQL 쿼리를 보기 좋게 포맷팅
   sql:
     init:
+      encoding: UTF-8
       mode: always #data.sql 항상 실행
   h2:
     console:
