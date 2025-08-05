@@ -56,6 +56,7 @@ public class BackupService {
 
       FileMetadata fileMetaData = fileMetaDataService.generateBackupFile(backup.getId(),
           employees);
+
       return saveBackup(backup, fileMetaData, workerIp, BackupStatus.COMPLETED);
 
     } catch (Exception e) {
@@ -65,13 +66,13 @@ public class BackupService {
   }
 
   private boolean shouldSkipBackup() {
-    Optional<ChangeLog> recentChangeLog = changeLogRepository.findFirstByUpdatedAtDesc();
+    Optional<ChangeLog> recentChangeLog = changeLogRepository.findFirstByOrderByUpdatedAtDesc();
     if (recentChangeLog.isEmpty()) {  //수정 내역 없으면 스킵
       return true;
     }
     LocalDateTime recentChangeLogTime = recentChangeLog.get().getUpdatedAt();
 
-    Optional<Backup> recentBackup = backupRepository.findFirstOrderByCreatedAtDesc();
+    Optional<Backup> recentBackup = backupRepository.findFirstByOrderByCreatedAtDesc();
     if (recentBackup.isEmpty()) { // 첫 백업 수행해야함
       return false;
     }

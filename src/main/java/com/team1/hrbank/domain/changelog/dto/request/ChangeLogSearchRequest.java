@@ -11,10 +11,11 @@ public record ChangeLogSearchRequest(
         String ipAddress,
         ChangeLogType type,
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        LocalDateTime from,
+        LocalDateTime atFrom,
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        LocalDateTime to,
-        Long lastId,
+        LocalDateTime atTo,
+        Long idAfter,
+        String cursor,
         String sortField,
         String sortDirection,
         Integer size

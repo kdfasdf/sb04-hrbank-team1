@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface BackupMapper {
 
 
+  @Mapping(target = "fileId", source = "fileMetadata.id")
   @Mapping(target = "startedAt", source = "createdAt")
   BackupDto toDto(Backup backup);
 }

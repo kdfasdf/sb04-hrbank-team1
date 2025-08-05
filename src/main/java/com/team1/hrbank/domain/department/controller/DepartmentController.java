@@ -6,7 +6,7 @@ import com.team1.hrbank.domain.department.dto.response.DepartmentDto;
 import com.team1.hrbank.domain.department.dto.request.DepartmentCreateRequestDto;
 import com.team1.hrbank.domain.department.dto.response.DepartmentPageResponseDto;
 import com.team1.hrbank.domain.department.service.DepartmentService;
-import io.swagger.v3.oas.annotations.Parameter;
+import com.team1.hrbank.global.api.DepartmentApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
-@Tag(name = "부서 관리", description = "부서 관리 API")
-public class DepartmentController implements SwaggerDepartmentController {
+public class DepartmentController implements DepartmentApi {
 
   private final DepartmentService departmentService;
 
+  @Override
   @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<DepartmentDto> create(
       @RequestBody DepartmentCreateRequestDto departmentCreateRequestDto) {
@@ -36,6 +36,7 @@ public class DepartmentController implements SwaggerDepartmentController {
     return ResponseEntity.ok(department);
   }
 
+  @Override
   @PatchMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<DepartmentDto> update(
       @PathVariable("id") Long id,
@@ -45,6 +46,7 @@ public class DepartmentController implements SwaggerDepartmentController {
     return ResponseEntity.ok(department);
   }
 
+  @Override
   @GetMapping(path = "/{id}")
   public ResponseEntity<DepartmentDto> findOne(
       @PathVariable("id") Long id) {
@@ -52,6 +54,7 @@ public class DepartmentController implements SwaggerDepartmentController {
     return ResponseEntity.ok(findOne);
   }
 
+  @Override
   @GetMapping
   public ResponseEntity<DepartmentPageResponseDto> findDepartments(
       @RequestParam(required = false) String nameOrDescription,
@@ -70,6 +73,7 @@ public class DepartmentController implements SwaggerDepartmentController {
     return ResponseEntity.ok(responseDto);
   }
 
+  @Override
   @DeleteMapping(path = "{id}")
   public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
     departmentService.delete(id);
