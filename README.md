@@ -54,6 +54,13 @@
 - 최근 백업 정보 조회
 - 백업 데이터, 에러 로그 저장
 
+## ERD
+<img width="700" height="595" alt="image" src="https://github.com/user-attachments/assets/40a29c8b-cd0b-4bfe-abd7-51be7981cd6d" />
+
+### 협업 도구
+- Github
+- Notion
+
 ## 프로젝트 구조
 
 ```
