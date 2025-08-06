@@ -6,7 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+
 import java.time.LocalDateTime;
+
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,15 +19,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)  // Auditing
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  protected Long id;
 
-    @CreatedDate
-    @Column(name = "createdAt", updatable = false, nullable = false)
-    protected LocalDateTime createdAt;
+  @CreatedDate
+  @Column(name = "createdAt", updatable = false, nullable = false)
+  protected LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Column(name = "updatedAt", nullable = false)
-    protected LocalDateTime updatedAt;
+  @LastModifiedDate
+  @Column(name = "updatedAt", nullable = false)
+  protected LocalDateTime updatedAt;
 }
